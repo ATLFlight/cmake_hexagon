@@ -108,6 +108,8 @@ function(QURT_BUNDLE)
 		${QURT_BUNDLE_DSP_SOURCES}
 		)
 
+	target_link_libraries(${QURT_BUNDLE_APP_NAME} ${QURT_BUNDLE_DSP_LINK_LIBS})
+
 	add_dependencies(${QURT_BUNDLE_APP_NAME} generate_${QURT_BUNDLE_APP_NAME}_stubs)
 
 	# Build lib that is run on the DSP invoked by RPC framework
