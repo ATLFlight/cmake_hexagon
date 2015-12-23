@@ -43,7 +43,9 @@ set(HEXAGON_SDK_ROOT $ENV{HEXAGON_SDK_ROOT})
 
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
+	${HEXAGON_SDK_ROOT}/inc
 	${HEXAGON_SDK_ROOT}/inc/stddef
+	${HEXAGON_SDK_ROOT}/lib/common/rpcmem
 	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/hexagon_Debug
 	)
 
@@ -67,7 +69,7 @@ include (CMakeParseArguments)
 function(QURT_BUNDLE)
 	set(options)
 	set(oneValueArgs APP_NAME APPS_COMPILER APPS_DEST)
-	set(multiValueArgs APPS_SOURCES APPS_LINK_LIBS DSP_SOURCES DSP_LINK_LIBS)
+	set(multiValueArgs APPS_SOURCES APPS_LINK_LIBS APPS_INCS DSP_SOURCES DSP_LINK_LIBS)
 	cmake_parse_arguments(QURT_BUNDLE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
 	message("APP_NAME = ${QURT_BUNDLE_APP_NAME}")
@@ -113,7 +115,10 @@ function(QURT_BUNDLE)
 	set(${APP_APP_NAME}_INCLUDE_DIRS 
 		-I${CMAKE_CURRENT_BINARY_DIR}
 		-I${HEXAGON_SDK_ROOT}/inc/stddef
+		-I${HEXAGON_SDK_ROOT}/lib/common/rpcmem
+		-I${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_Debug
 		-I${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug
+		${QURT_BUNDLE_APPS_INCS}
 		)
 	set(${APP_APP_NAME}_LINK_DIRS -L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc)
 
