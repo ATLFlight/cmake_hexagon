@@ -32,11 +32,11 @@
 ############################################################################
 
 if ("${HEXAGON_TOOLS_ROOT}" STREQUAL "")
-	message( FATAL_ERROR "HEXAGON_TOOLS_ROOT not set")
+	message(FATAL_ERROR "HEXAGON_TOOLS_ROOT not set")
 endif()
 
 if ("$ENV{HEXAGON_SDK_ROOT}" STREQUAL "")
-	message( FATAL_ERROR "HEXAGON_SDK_ROOT not set")
+	message(FATAL_ERROR "HEXAGON_SDK_ROOT not set")
 endif()
 
 set(HEXAGON_SDK_ROOT $ENV{HEXAGON_SDK_ROOT})
@@ -77,6 +77,11 @@ function(QURT_BUNDLE)
 	# Set default install path of apps processor executable
 	if ("${QURT_BUNDLE_APPS_DEST}" STREQUAL "")
 		set(QURT_BUNDLE_APPS_DEST "/home/linaro")
+	endif()
+
+	# Make sure apps compiler is provided
+	if ("${QURT_BUNDLE_APPS_COMPILER}" STREQUAL "")
+		message(FATAL_ERROR "APPS_COMPILER not specified in call to QURT_BUNDLE")
 	endif()
 
 	add_custom_command(
