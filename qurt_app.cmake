@@ -66,11 +66,16 @@ include (CMakeParseArguments)
 #
 function(QURT_BUNDLE)
 	set(options)
-	set(oneValueArgs APP_NAME APPS_COMPILER)
+	set(oneValueArgs APP_NAME APPS_COMPILER APPS_DEST)
 	set(multiValueArgs APPS_SOURCES APPS_LINK_LIBS DSP_SOURCES DSP_LINK_LIBS)
 	cmake_parse_arguments(QURT_BUNDLE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
 	message("APP_NAME = ${QURT_BUNDLE_APP_NAME}")
+
+	# Set default install path of apps processor executable
+	if ("${QURT_BUNDLE_APPS_DEST}" STREQUAL "")
+		set(QURT_BUNDLE_APPS_DEST "/home/linaro")
+	endif()
 
 	add_custom_command(
 		OUTPUT ${QURT_BUNDLE_APP_NAME}.h ${QURT_BUNDLE_APP_NAME}_skel.c ${QURT_BUNDLE_APP_NAME}_stub.c
@@ -103,6 +108,8 @@ function(QURT_BUNDLE)
 		${QURT_BUNDLE_APP_NAME}_skel.c
 		)
 
+	target_link_libraries(${QURT_BUNDLE_APP_NAME}_skel ${QURT_BUNDLE_APP_NAME})
+
 	set(${APP_APP_NAME}_INCLUDE_DIRS 
 		-I${CMAKE_CURRENT_BINARY_DIR}
 		-I${HEXAGON_SDK_ROOT}/inc/stddef
@@ -124,8 +131,13 @@ function(QURT_BUNDLE)
 
 	add_dependencies(${QURT_BUNDLE_APP_NAME}_skel generate_${QURT_BUNDLE_APP_NAME}_stubs build_${QURT_BUNDLE_APP_NAME}_apps)
 
-	add_custom_target(${QURT_BUNDLE_APP_NAME}-load ALL
+	add_custom_target(${QURT_BUNDLE_APP_NAME}-load
 		DEPENDS ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APP_NAME}
+		COMMAND adb wait-for-devices
+		COMMAND adb push lib${QURT_BUNDLE_APP_NAME}_skel.so /usr/share/data/adsp/
+		COMMAND adb push lib${QURT_BUNDLE_APP_NAME}.so /usr/share/data/adsp/
+		COMMAND adb push ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_DEST}
+		COMMAND echo "Pushed ${QURT_BUNDLE_APP_NAME}_app to ${QURT_BUNDLE_APPS_DEST}"
 		)
 endfunction()
 
