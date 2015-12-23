@@ -1,7 +1,7 @@
 # CMake Rules for QuRT Applications
 
 Hexagon apps are started from an app running on the apps processor 
-of the SoC. An RPC mechanism is used to load the app on the DSP and
+of the SoC. A RPC mechanism is used to load the app on the DSP and
 the RPC stubs are generated from a IDL complier (qaic). The RTOS on
 the DSP is QuRT but is often abstraced by the DSPAL APIs.
 
