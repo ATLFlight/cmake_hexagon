@@ -108,7 +108,13 @@ function(QURT_BUNDLE)
 		${QURT_BUNDLE_DSP_SOURCES}
 		)
 
-	target_link_libraries(${QURT_BUNDLE_APP_NAME} ${QURT_BUNDLE_DSP_LINK_LIBS})
+	target_link_libraries(${QURT_BUNDLE_APP_NAME}
+		-Wl,--whole-archive
+		${QURT_BUNDLE_DSP_LINK_LIBS}
+		m
+		-Wl,--no-whole-archive
+		-Wl,${TOOLSLIB}/pic/libstdc++.a
+		)
 
 	add_dependencies(${QURT_BUNDLE_APP_NAME} generate_${QURT_BUNDLE_APP_NAME}_stubs)
 

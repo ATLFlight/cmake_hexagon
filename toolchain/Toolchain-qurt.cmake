@@ -53,7 +53,7 @@ set(V_ARCH "v5")
 set(CROSSDEV "hexagon-")
 set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/bin)
 set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
-set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
+set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0)
 
 # Use the HexagonTools compiler (7.2.10)
 set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
