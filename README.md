@@ -10,7 +10,14 @@ in the DSP lib and in the apps application. The generated stubs are
 automatically build into the appropriate target.
 
 For an app named testapp, the result will be:
-- testapp_app     - Run on apps processor
-- testapp.so      - copy to target at /usr/share/date/adsp/
-- testapp_skel.so - copy to target at /usr/share/date/adsp/
+- testapp_app        - Run on apps processor
+- libtestapp.so      - copy to target at /usr/share/date/adsp/
+- libtestapp_skel.so - copy to target at /usr/share/date/adsp/
+
+To load the testapp application to the target you can run the 
+following command from inside the build tree:
+
+```
+make testapp-load
+```
 
