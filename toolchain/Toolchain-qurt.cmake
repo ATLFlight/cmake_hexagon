@@ -53,7 +53,7 @@ set(V_ARCH "v5")
 set(CROSSDEV "hexagon-")
 set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/bin)
 set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
-set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0)
+set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
 
 # Use the HexagonTools compiler (7.2.10)
 set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
@@ -61,17 +61,57 @@ set(CMAKE_CXX_COMPILER  ${HEXAGON_BIN}/${CROSSDEV}clang++)
 
 set(CMAKE_AR	  ${HEXAGON_BIN}/${CROSSDEV}ar CACHE FILEPATH "Archiver")
 set(CMAKE_RANLIB  ${HEXAGON_BIN}/${CROSSDEV}ranlib)
-set(CMAKE_LINKER  ${HEXAGON_BIN}/${CROSSDEV}ld.qcld)
 set(CMAKE_NM	  ${HEXAGON_BIN}/${CROSSDEV}nm)
 set(CMAKE_OBJDUMP ${HEXAGON_BIN}/${CROSSDEV}objdump)
 set(CMAKE_OBJCOPY ${HEXAGON_BIN}/${CROSSDEV}objcopy)
+set(CMAKE_SKIP_RPATH TRUE CACHE BOOL SKIP_RPATH FORCE)
 
-list2string(HEXAGON_INCLUDE_DIRS 
-	-I${HEXAGON_TOOLS_ROOT}/Tools/target/hexagon/include
+set(HEXAGON_START_LINK_FLAGS)
+list2string(HEXAGON_START_LINK_FLAGS
+	-march=hexagon
+	-mcpu=hexagonv5
+	-shared
+	-call_shared
+	-G0
+	${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/initS.o
+	"-o <TARGET>"
+	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic
+	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0
+	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib
+	-Bsymbolic
+	${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/libgcc.a
+	--wrap=malloc
+	--wrap=calloc
+	--wrap=free
+	--wrap=realloc
+	--wrap=memalign
+	--wrap=__stack_chk_fail
+	-lc
+	"-soname=<TARGET_SONAME>"
+	)
+
+set(HEXAGON_END_LINK_FLAGS)
+list2string(HEXAGON_END_LINK_FLAGS
+	--start-group
+	-lgcc
+	--end-group
+	${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/finiS.o
+	)
+
+set(HEXAGON_LIBSTDCXX ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/libstdc++.a)
+
+set(CMAKE_C_CREATE_SHARED_LIBRARY
+	"${HEXAGON_BIN}/${CROSSDEV}link ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --end-group ${HEXAGON_END_LINK_FLAGS}")
+
+set(CMAKE_CXX_CREATE_SHARED_LIBRARY
+	"${HEXAGON_BIN}/${CROSSDEV}link ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --no-whole-archive ${HEXAGON_LIBSTDCXX} --end-group ${HEXAGON_END_LINK_FLAGS}")
+
+list2string(HEXAGON_INCLUDE_DIRS
+	#-I${HEXAGON_TOOLS_ROOT}/target/hexagon/include
 	-I${CMAKE_SOURCE_DIR}/external/dspal/include
 	)
 
-set(DYNAMIC_LIBS  -Wl,${TOOLSLIB}/libstdc++.a)
+set(DYNAMIC_LIBS -Wl,${TOOLSLIB}/libstdc++.a)
 
 #set(MAXOPTIMIZATION -O0)
 
@@ -80,14 +120,15 @@ set(DYNAMIC_LIBS  -Wl,${TOOLSLIB}/libstdc++.a)
 set(ARCHCPUFLAGS
 	-m${V_ARCH}
 	-G0
+	-v
 	)
 
 add_definitions(
 	-D__DF_QURT
 	-D_PID_T -D_UID_T -D_TIMER_T
-	-Dnoreturn_function= 
+	-Dnoreturn_function=
 	-D_HAS_C9X
-	-D__EXPORT= 
+	-D__EXPORT=
 	-Drestrict=
 	-D_DEBUG
 	-Wno-error=shadow
@@ -155,7 +196,7 @@ set(EXTRA_LIBS ${EXTRA_LIBS} ${LIBM})
 
 # Flags we pass to the C compiler
 #
-list2string(CFLAGS 
+list2string(CFLAGS
 	${ARCHCFLAGS}
 	${ARCHCWARNINGS}
 	${ARCHOPTIMIZATION}
@@ -186,7 +227,7 @@ list2string(CXXFLAGS
 # Flags we pass to the assembler
 #
 list2string(AFLAGS
-	${CFLAGS} 
+	${CFLAGS}
 	-D__ASSEMBLY__
 	${EXTRADEFINES}
 	${EXTRAAFLAGS}
@@ -209,17 +250,17 @@ list2string(QURT_CMAKE_CXX_FLAGS
 
 set(CMAKE_CXX_FLAGS ${QURT_CMAKE_CXX_FLAGS} CACHE STRING "cxxflags")
 
-message(STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
-message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-
 # Flags we pass to the linker
-#
+# CMake make test builds of apps to validate the compiler
+# we never use a linked app for the Hexagon as apps are run as
+# dynamic libraries and invoked via FastRPC
+# These settings enable CMake to build the required test apps
 list2string(CMAKE_EXE_LINKER_FLAGS
 	-g
 	-mv5
 	-mG0lib
 	-G0
-	-fPIC
+	-fpic
 	-shared
 	-Wl,-Bsymbolic
 	-Wl,--wrap=malloc
@@ -233,27 +274,10 @@ list2string(CMAKE_EXE_LINKER_FLAGS
 	${EXTRALDFLAGS}
 	)
 
-# Flags we pass to the linker
-#
-list2string(CMAKE_SHARED_LINKER_FLAGS
-	-g
-	-mv5
-	-mG0lib
-	-G0
-	-shared
-	-Wl,-Bsymbolic
-	-Wl,--wrap=malloc
-	-Wl,--wrap=calloc
-	-Wl,--wrap=free
-	-Wl,--wrap=realloc
-	-Wl,--wrap=memalign
-	-Wl,--wrap=__stack_chk_fail
-	${DYNAMIC_LIBS}
-	-lc
-	${EXTRALDFLAGS}
-	)
+message(STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
-# where is the target environment 
+# where is the target environment
 set(CMAKE_FIND_ROOT_PATH  get_file_component(${C_COMPILER} PATH))
 
 set(CMAKE_C_COMPILER_ID, "Clang")
@@ -284,5 +308,7 @@ endmacro()
 function (df_add_library df_library_name)
 	set(args "${ARGN}")
 	add_library (${df_library_name} ${args})
+	target_link_libraries(${df_library_name}
+		)
 	set_property(TARGET ${df_library_name} PROPERTY POSITION_INDEPENDENT_CODE ON)
 endfunction ()

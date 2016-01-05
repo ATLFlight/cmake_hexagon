@@ -69,11 +69,12 @@ include (CMakeParseArguments)
 function(QURT_BUNDLE)
 	set(options)
 	set(oneValueArgs APP_NAME APPS_COMPILER APPS_DEST)
-	set(multiValueArgs APPS_SOURCES APPS_LINK_LIBS APPS_INCS DSP_SOURCES DSP_LINK_LIBS)
+	set(multiValueArgs APPS_SOURCES APPS_LINK_LIBS APPS_INCS DSP_SOURCES DSP_LINK_LIBS DSP_INCS)
 	cmake_parse_arguments(QURT_BUNDLE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
 	message("APP_NAME = ${QURT_BUNDLE_APP_NAME}")
 
+	# Build lib that is run on the DSP invoked by RPC framework
 	# Set default install path of apps processor executable
 	if ("${QURT_BUNDLE_APPS_DEST}" STREQUAL "")
 		set(QURT_BUNDLE_APPS_DEST "/home/linaro")
@@ -83,6 +84,7 @@ function(QURT_BUNDLE)
 	if ("${QURT_BUNDLE_APPS_COMPILER}" STREQUAL "")
 		message(FATAL_ERROR "APPS_COMPILER not specified in call to QURT_BUNDLE")
 	endif()
+
 
 	add_custom_command(
 		OUTPUT ${QURT_BUNDLE_APP_NAME}.h ${QURT_BUNDLE_APP_NAME}_skel.c ${QURT_BUNDLE_APP_NAME}_stub.c
@@ -103,27 +105,28 @@ function(QURT_BUNDLE)
 		GENERATED TRUE
 		)
 
+	message("DSP_INCS = ${QURT_BUNDLE_DSP_INCS}")
+
 	# Build lib that is run on the DSP
 	add_library(${QURT_BUNDLE_APP_NAME} SHARED
 		${QURT_BUNDLE_DSP_SOURCES}
 		)
 
+	target_include_directories(${QURT_BUNDLE_APP_NAME} PUBLIC ${QURT_BUNDLE_DSP_INCS})
+
 	target_link_libraries(${QURT_BUNDLE_APP_NAME}
-		-Wl,--whole-archive
 		${QURT_BUNDLE_DSP_LINK_LIBS}
-		m
-		-Wl,--no-whole-archive
-		-Wl,${TOOLSLIB}/pic/libstdc++.a
 		)
 
 	add_dependencies(${QURT_BUNDLE_APP_NAME} generate_${QURT_BUNDLE_APP_NAME}_stubs)
 
-	# Build lib that is run on the DSP invoked by RPC framework
 	add_library(${QURT_BUNDLE_APP_NAME}_skel SHARED
 		${QURT_BUNDLE_APP_NAME}_skel.c
 		)
 
-	target_link_libraries(${QURT_BUNDLE_APP_NAME}_skel ${QURT_BUNDLE_APP_NAME})
+	target_link_libraries(${QURT_BUNDLE_APP_NAME}_skel
+		${QURT_BUNDLE_APP_NAME}
+		)
 
 	set(${APP_APP_NAME}_INCLUDE_DIRS 
 		-I${CMAKE_CURRENT_BINARY_DIR}
@@ -155,6 +158,9 @@ function(QURT_BUNDLE)
 		COMMAND adb push lib${QURT_BUNDLE_APP_NAME}_skel.so /usr/share/data/adsp/
 		COMMAND adb push lib${QURT_BUNDLE_APP_NAME}.so /usr/share/data/adsp/
 		COMMAND adb push ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_DEST}
+		COMMAND adb push ${TOOLSLIB}/libstdc++.so /usr/share/data/adsp/
+		COMMAND adb push ${TOOLSLIB}/libgcc.so /usr/share/data/adsp/
+		COMMAND adb push ${TOOLSLIB}/libc.so /usr/share/data/adsp/
 		COMMAND echo "Pushed ${QURT_BUNDLE_APP_NAME}_app to ${QURT_BUNDLE_APPS_DEST}"
 		)
 endfunction()
