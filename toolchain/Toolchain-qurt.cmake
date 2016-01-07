@@ -33,10 +33,12 @@ include(CMakeForceCompiler)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-if ("$ENV{HEXAGON_TOOLS_ROOT}" STREQUAL "")
-	message(FATAL_ERROR
-		"The HexagonTools version 7.2.10 must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
+set(TOOLS_ERROR_MSG 
+		"The HexagonTools version 6.4.X or 7.2.X must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
 		"(e.g. export HEXAGON_TOOLS_ROOT=${HOME}/Qualcomm/HEXAGON_Tools/7.2.10/Tools)")
+
+if ("$ENV{HEXAGON_TOOLS_ROOT}" STREQUAL "")
+	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
 else()
 	set(HEXAGON_TOOLS_ROOT $ENV{HEXAGON_TOOLS_ROOT})
 endif()
@@ -51,11 +53,37 @@ endmacro(list2string)
 
 set(V_ARCH "v5")
 set(CROSSDEV "hexagon-")
+
+# Detect compiler version
+if(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/6.4.")
+
+# Use the HexagonTools compiler (6.4.06)
+set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/qc/bin)
+set(HEXAGON_GNU_BIN ${HEXAGON_TOOLS_ROOT}/gnu/bin)
+set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
+set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/dinkumware/lib/${V_ARCH}/G0/pic)
+
+set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
+set(CMAKE_CXX_COMPILER  ${HEXAGON_BIN}/${CROSSDEV}clang++)
+
+set(CMAKE_AR	  ${HEXAGON_GNU_BIN}/${CROSSDEV}ar CACHE FILEPATH "Archiver")
+set(CMAKE_RANLIB  ${HEXAGON_GNU_BIN}/${CROSSDEV}ranlib)
+set(CMAKE_NM	  ${HEXAGON_GNU_BIN}/${CROSSDEV}nm)
+set(CMAKE_OBJDUMP ${HEXAGON_GNU_BIN}/${CROSSDEV}objdump)
+set(CMAKE_OBJCOPY ${HEXAGON_GNU_BIN}/${CROSSDEV}objcopy)
+set(HEXAGON_LINK  ${HEXAGON_GNU_BIN}/${CROSSDEV}ld)
+set(HEXAGON_ARCH_FLAGS  
+	-march=hexagon
+	-mcpu=hexagonv5
+	)
+
+elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
+
+# Use the HexagonTools compiler (7.2.X)
 set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/bin)
 set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
 set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
 
-# Use the HexagonTools compiler (7.2.10)
 set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
 set(CMAKE_CXX_COMPILER  ${HEXAGON_BIN}/${CROSSDEV}clang++)
 
@@ -65,22 +93,27 @@ set(CMAKE_NM	  ${HEXAGON_BIN}/${CROSSDEV}nm)
 set(CMAKE_OBJDUMP ${HEXAGON_BIN}/${CROSSDEV}objdump)
 set(CMAKE_OBJCOPY ${HEXAGON_BIN}/${CROSSDEV}objcopy)
 set(HEXAGON_LINK  ${HEXAGON_BIN}/${CROSSDEV}link)
+set(HEXAGON_ARCH_FLAGS  -march=hexagonv5)
+
+else()
+	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
+endif()
+
 set(CMAKE_SKIP_RPATH TRUE CACHE BOOL SKIP_RPATH FORCE)
 
 set(HEXAGON_START_LINK_FLAGS)
 list2string(HEXAGON_START_LINK_FLAGS
-	-march=hexagon
-	-mcpu=hexagonv5
+	${HEXAGON_ARCH_FLAGS}
 	-shared
 	-call_shared
 	-G0
-	${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/initS.o
+	${TOOLSLIB}/initS.o
 	"-o <TARGET>"
 	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic
 	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0
 	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib
 	-Bsymbolic
-	${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/libgcc.a
+	${TOOLSLIB}/libgcc.a
 	--wrap=malloc
 	--wrap=calloc
 	--wrap=free
@@ -96,16 +129,14 @@ list2string(HEXAGON_END_LINK_FLAGS
 	--start-group
 	-lgcc
 	--end-group
-	${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/finiS.o
+	${TOOLSLIB}/finiS.o
 	)
-
-set(HEXAGON_LIBSTDCXX ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/libstdc++.a)
 
 set(CMAKE_C_CREATE_SHARED_LIBRARY
 	"${HEXAGON_BIN}/${CROSSDEV}link ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --end-group ${HEXAGON_END_LINK_FLAGS}")
 
 set(CMAKE_CXX_CREATE_SHARED_LIBRARY
-	"${HEXAGON_BIN}/${CROSSDEV}link ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --no-whole-archive ${HEXAGON_LIBSTDCXX} --end-group ${HEXAGON_END_LINK_FLAGS}")
+	"${HEXAGON_BIN}/${CROSSDEV}link ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --no-whole-archive ${TOOLSLIB}/libstdc++.a --end-group ${HEXAGON_END_LINK_FLAGS}")
 
 list2string(HEXAGON_INCLUDE_DIRS
 	#-I${HEXAGON_TOOLS_ROOT}/target/hexagon/include
