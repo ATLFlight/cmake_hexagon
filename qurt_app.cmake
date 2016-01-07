@@ -158,7 +158,6 @@ function(QURT_BUNDLE)
 		COMMAND adb push lib${QURT_BUNDLE_APP_NAME}_skel.so /usr/share/data/adsp/
 		COMMAND adb push lib${QURT_BUNDLE_APP_NAME}.so /usr/share/data/adsp/
 		COMMAND adb push ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_DEST}
-		COMMAND adb push ${TOOLSLIB}/libstdc++.so /usr/share/data/adsp/
 		COMMAND adb push ${TOOLSLIB}/libgcc.so /usr/share/data/adsp/
 		COMMAND adb push ${TOOLSLIB}/libc.so /usr/share/data/adsp/
 		COMMAND echo "Pushed ${QURT_BUNDLE_APP_NAME}_app to ${QURT_BUNDLE_APPS_DEST}"

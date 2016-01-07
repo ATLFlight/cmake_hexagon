@@ -35,8 +35,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 if ("$ENV{HEXAGON_TOOLS_ROOT}" STREQUAL "")
 	message(FATAL_ERROR
-		"The HexagonTools version 7.2.10 must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
-		"(e.g. export HEXAGON_TOOLS_ROOT=${HOME}/Qualcomm/HEXAGON_Tools/7.2.10/Tools)")
+		"The HexagonTools version 6.4.06 must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
+		"(e.g. export HEXAGON_TOOLS_ROOT=${HOME}/Qualcomm/HEXAGON_Tools/6.4.06)")
 else()
 	set(HEXAGON_TOOLS_ROOT $ENV{HEXAGON_TOOLS_ROOT})
 endif()
@@ -51,20 +51,21 @@ endmacro(list2string)
 
 set(V_ARCH "v5")
 set(CROSSDEV "hexagon-")
-set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/bin)
+set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/qc/bin)
+set(HEXAGON_GNU_BIN	${HEXAGON_TOOLS_ROOT}/gnu/bin)
 set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
-set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
+set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/dinkumware/lib/${V_ARCH}/G0/pic)
 
-# Use the HexagonTools compiler (7.2.10)
+# Use the HexagonTools compiler (6.4.06)
 set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
 set(CMAKE_CXX_COMPILER  ${HEXAGON_BIN}/${CROSSDEV}clang++)
 
-set(CMAKE_AR	  ${HEXAGON_BIN}/${CROSSDEV}ar CACHE FILEPATH "Archiver")
-set(CMAKE_RANLIB  ${HEXAGON_BIN}/${CROSSDEV}ranlib)
-set(CMAKE_NM	  ${HEXAGON_BIN}/${CROSSDEV}nm)
-set(CMAKE_OBJDUMP ${HEXAGON_BIN}/${CROSSDEV}objdump)
-set(CMAKE_OBJCOPY ${HEXAGON_BIN}/${CROSSDEV}objcopy)
-set(HEXAGON_LINK  ${HEXAGON_BIN}/${CROSSDEV}link)
+set(CMAKE_AR	  ${HEXAGON_GNU_BIN}/${CROSSDEV}ar CACHE FILEPATH "Archiver")
+set(CMAKE_RANLIB  ${HEXAGON_GNU_BIN}/${CROSSDEV}ranlib)
+set(CMAKE_NM	  ${HEXAGON_GNU_BIN}/${CROSSDEV}nm)
+set(CMAKE_OBJDUMP ${HEXAGON_GNU_BIN}/${CROSSDEV}objdump)
+set(CMAKE_OBJCOPY ${HEXAGON_GNU_BIN}/${CROSSDEV}objcopy)
+set(HEXAGON_LINK  ${HEXAGON_GNU_BIN}/${CROSSDEV}ld)
 set(CMAKE_SKIP_RPATH TRUE CACHE BOOL SKIP_RPATH FORCE)
 
 set(HEXAGON_START_LINK_FLAGS)
@@ -74,16 +75,13 @@ list2string(HEXAGON_START_LINK_FLAGS
 	-shared
 	-call_shared
 	-G0
-	${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/initS.o
+	-v
+	${TOOLSLIB}/initS.o
 	"-o <TARGET>"
-	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic
-	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0
-	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib
+	-L${TOOLSLIB}
 	-Bsymbolic
-	${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/libgcc.a
-	--wrap=malloc
+	${TOOLSLIB}/libgcc.a
 	--wrap=calloc
-	--wrap=free
 	--wrap=realloc
 	--wrap=memalign
 	--wrap=__stack_chk_fail
@@ -96,19 +94,18 @@ list2string(HEXAGON_END_LINK_FLAGS
 	--start-group
 	-lgcc
 	--end-group
-	${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/finiS.o
+	${TOOLSLIB}/finiS.o
 	)
 
-set(HEXAGON_LIBSTDCXX ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic/libstdc++.a)
+set(HEXAGON_LIBSTDCXX ${HEXAGON_TOOLS_ROOT}/dinkumware/lib/v5/G0/pic/libstdc++.a)
 
-set(CMAKE_C_CREATE_SHARED_LIBRARY
-	"${HEXAGON_BIN}/${CROSSDEV}link ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --end-group ${HEXAGON_END_LINK_FLAGS}")
+#set(CMAKE_C_CREATE_SHARED_LIBRARY
+#	"${HEXAGON_LINK} ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --end-group ${HEXAGON_END_LINK_FLAGS}")
 
-set(CMAKE_CXX_CREATE_SHARED_LIBRARY
-	"${HEXAGON_BIN}/${CROSSDEV}link ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --no-whole-archive ${HEXAGON_LIBSTDCXX} --end-group ${HEXAGON_END_LINK_FLAGS}")
+#set(CMAKE_CXX_CREATE_SHARED_LIBRARY
+#	"${HEXAGON_LINK} ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --no-whole-archive ${HEXAGON_LIBSTDCXX} --end-group ${HEXAGON_END_LINK_FLAGS}")
 
 list2string(HEXAGON_INCLUDE_DIRS
-	#-I${HEXAGON_TOOLS_ROOT}/target/hexagon/include
 	-I${CMAKE_SOURCE_DIR}/external/dspal/include
 	)
 
@@ -264,9 +261,7 @@ list2string(CMAKE_EXE_LINKER_FLAGS
 	-fpic
 	-shared
 	-Wl,-Bsymbolic
-	-Wl,--wrap=malloc
 	-Wl,--wrap=calloc
-	-Wl,--wrap=free
 	-Wl,--wrap=realloc
 	-Wl,--wrap=memalign
 	-Wl,--wrap=__stack_chk_fail
