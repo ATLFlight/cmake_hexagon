@@ -72,10 +72,7 @@ set(CMAKE_NM	  ${HEXAGON_GNU_BIN}/${CROSSDEV}nm)
 set(CMAKE_OBJDUMP ${HEXAGON_GNU_BIN}/${CROSSDEV}objdump)
 set(CMAKE_OBJCOPY ${HEXAGON_GNU_BIN}/${CROSSDEV}objcopy)
 set(HEXAGON_LINK  ${HEXAGON_GNU_BIN}/${CROSSDEV}ld)
-set(HEXAGON_ARCH_FLAGS  
-	-march=hexagon
-	-mcpu=hexagonv5
-	)
+set(HEXAGON_ARCH_FLAGS  -march=hexagonv5)
 
 elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
 
@@ -93,7 +90,10 @@ set(CMAKE_NM	  ${HEXAGON_BIN}/${CROSSDEV}nm)
 set(CMAKE_OBJDUMP ${HEXAGON_BIN}/${CROSSDEV}objdump)
 set(CMAKE_OBJCOPY ${HEXAGON_BIN}/${CROSSDEV}objcopy)
 set(HEXAGON_LINK  ${HEXAGON_BIN}/${CROSSDEV}link)
-set(HEXAGON_ARCH_FLAGS  -march=hexagonv5)
+set(HEXAGON_ARCH_FLAGS  
+	-march=hexagon
+	-mcpu=hexagonv5
+	)
 
 else()
 	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
@@ -109,9 +109,7 @@ list2string(HEXAGON_START_LINK_FLAGS
 	-G0
 	${TOOLSLIB}/initS.o
 	"-o <TARGET>"
-	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0/pic
-	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/v5/G0
-	-L${HEXAGON_TOOLS_ROOT}/target/hexagon/lib
+	-L${TOOLSLIB}
 	-Bsymbolic
 	${TOOLSLIB}/libgcc.a
 	--wrap=malloc
@@ -133,13 +131,12 @@ list2string(HEXAGON_END_LINK_FLAGS
 	)
 
 set(CMAKE_C_CREATE_SHARED_LIBRARY
-	"${HEXAGON_BIN}/${CROSSDEV}link ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --end-group ${HEXAGON_END_LINK_FLAGS}")
+	"${HEXAGON_LINK} ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --end-group ${HEXAGON_END_LINK_FLAGS}")
 
 set(CMAKE_CXX_CREATE_SHARED_LIBRARY
-	"${HEXAGON_BIN}/${CROSSDEV}link ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --no-whole-archive ${TOOLSLIB}/libstdc++.a --end-group ${HEXAGON_END_LINK_FLAGS}")
+	"${HEXAGON_LINK} ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --no-whole-archive ${TOOLSLIB}/libstdc++.a --end-group ${HEXAGON_END_LINK_FLAGS}")
 
 list2string(HEXAGON_INCLUDE_DIRS
-	#-I${HEXAGON_TOOLS_ROOT}/target/hexagon/include
 	-I${CMAKE_SOURCE_DIR}/external/dspal/include
 	)
 
