@@ -85,7 +85,7 @@ function(QURT_BUNDLE)
 		message(FATAL_ERROR "APPS_COMPILER not specified in call to QURT_BUNDLE")
 	endif()
 
-
+	# Run the IDL compiler to generate the stubs
 	add_custom_command(
 		OUTPUT ${QURT_BUNDLE_APP_NAME}.h ${QURT_BUNDLE_APP_NAME}_skel.c ${QURT_BUNDLE_APP_NAME}_stub.c
 		DEPENDS ${QURT_BUNDLE_APP_NAME}.idl
@@ -138,7 +138,7 @@ function(QURT_BUNDLE)
 		)
 	set(${APP_APP_NAME}_LINK_DIRS -L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc)
 
-	# Build the apps processor app and RPC stub
+	# Build the apps processor app and RPC stub using the provided ${QURT_BUNDLE_APPS_COMPILER}
 	add_custom_command(
 		OUTPUT ${QURT_BUNDLE_APP_NAME}_app
 		DEPENDS generate_${QURT_BUNDLE_APP_NAME}_stubs
@@ -152,6 +152,7 @@ function(QURT_BUNDLE)
 
 	add_dependencies(${QURT_BUNDLE_APP_NAME}_skel generate_${QURT_BUNDLE_APP_NAME}_stubs build_${QURT_BUNDLE_APP_NAME}_apps)
 
+	# Add a rule to load the files onto the target
 	add_custom_target(${QURT_BUNDLE_APP_NAME}-load
 		DEPENDS ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APP_NAME}
 		COMMAND adb wait-for-devices

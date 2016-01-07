@@ -70,8 +70,7 @@ set(CMAKE_SKIP_RPATH TRUE CACHE BOOL SKIP_RPATH FORCE)
 
 set(HEXAGON_START_LINK_FLAGS)
 list2string(HEXAGON_START_LINK_FLAGS
-	-march=hexagon
-	-mcpu=hexagonv5
+	-march=hexagonv5
 	-shared
 	-call_shared
 	-G0
@@ -81,7 +80,9 @@ list2string(HEXAGON_START_LINK_FLAGS
 	-L${TOOLSLIB}
 	-Bsymbolic
 	${TOOLSLIB}/libgcc.a
+	--wrap=malloc
 	--wrap=calloc
+	--wrap=free
 	--wrap=realloc
 	--wrap=memalign
 	--wrap=__stack_chk_fail
@@ -99,11 +100,11 @@ list2string(HEXAGON_END_LINK_FLAGS
 
 set(HEXAGON_LIBSTDCXX ${HEXAGON_TOOLS_ROOT}/dinkumware/lib/v5/G0/pic/libstdc++.a)
 
-#set(CMAKE_C_CREATE_SHARED_LIBRARY
-#	"${HEXAGON_LINK} ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --end-group ${HEXAGON_END_LINK_FLAGS}")
+set(CMAKE_C_CREATE_SHARED_LIBRARY
+	"${HEXAGON_LINK} ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --end-group ${HEXAGON_END_LINK_FLAGS}")
 
-#set(CMAKE_CXX_CREATE_SHARED_LIBRARY
-#	"${HEXAGON_LINK} ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --no-whole-archive ${HEXAGON_LIBSTDCXX} --end-group ${HEXAGON_END_LINK_FLAGS}")
+set(CMAKE_CXX_CREATE_SHARED_LIBRARY
+	"${HEXAGON_LINK} ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --no-whole-archive ${HEXAGON_LIBSTDCXX} --end-group ${HEXAGON_END_LINK_FLAGS}")
 
 list2string(HEXAGON_INCLUDE_DIRS
 	-I${CMAKE_SOURCE_DIR}/external/dspal/include
@@ -261,7 +262,9 @@ list2string(CMAKE_EXE_LINKER_FLAGS
 	-fpic
 	-shared
 	-Wl,-Bsymbolic
+	-Wl,--wrap=malloc
 	-Wl,--wrap=calloc
+	-Wl,--wrap=free
 	-Wl,--wrap=realloc
 	-Wl,--wrap=memalign
 	-Wl,--wrap=__stack_chk_fail
