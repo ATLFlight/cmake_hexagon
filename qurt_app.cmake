@@ -94,7 +94,7 @@ function(QURT_BUNDLE)
 		GENERATED TRUE
 		)
 
-	if (NOT "${APPS_SOURCES}" STREQUAL "")
+	if (NOT "${QURT_BUNDLE_APPS_SOURCES}" STREQUAL "")
 		# Build lib that is run on the DSP invoked by RPC framework
 		# Set default install path of apps processor executable
 		if ("${QURT_BUNDLE_APPS_DEST}" STREQUAL "")
@@ -106,7 +106,7 @@ function(QURT_BUNDLE)
 			message(FATAL_ERROR "APPS_COMPILER not specified in call to QURT_BUNDLE")
 		endif()
 
-		set(${APP_APP_NAME}_INCLUDE_DIRS 
+		set(${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS 
 			-I${CMAKE_CURRENT_BINARY_DIR}
 			-I${HEXAGON_SDK_ROOT}/inc/stddef
 			-I${HEXAGON_SDK_ROOT}/lib/common/rpcmem
@@ -114,13 +114,13 @@ function(QURT_BUNDLE)
 			-I${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug
 			${QURT_BUNDLE_APPS_INCS}
 			)
-		set(${APP_APP_NAME}_LINK_DIRS -L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc)
+		set(${QURT_BUNDLE_APP_NAME}_LINK_DIRS -L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc)
 
 		# Build the apps processor app and RPC stub using the provided ${QURT_BUNDLE_APPS_COMPILER}
 		add_custom_command(
 			OUTPUT ${QURT_BUNDLE_APP_NAME}_app
 			DEPENDS generate_${QURT_BUNDLE_APP_NAME}_stubs
-			COMMAND ${QURT_BUNDLE_APPS_COMPILER}  ${${APP_APP_NAME}_INCLUDE_DIRS} -o ${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME}_stub.c" ${${APP_APP_NAME}_LINK_DIRS}
+			COMMAND ${QURT_BUNDLE_APPS_COMPILER}  ${${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS} -o ${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME}_stub.c" ${${QURT_BUNDLE_APP_NAME}_LINK_DIRS}
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			)
 
@@ -138,7 +138,7 @@ function(QURT_BUNDLE)
 			)
 		endif()
 
-	if (NOT "${DSP_SOURCES}" STREQUAL "")
+	if (NOT "${QURT_BUNDLE_DSP_SOURCES}" STREQUAL "")
 		message("DSP_INCS = ${QURT_BUNDLE_DSP_INCS}")
 
 		# Build lib that is run on the DSP
@@ -175,7 +175,7 @@ function(QURT_BUNDLE)
 			)
 		endif()
 
-	if (NOT "${APPS_SOURCES}" STREQUAL "" and NOT "${DSP_SOURCES}" STREQUAL "")
+	if ((NOT "${QURT_BUNDLE_APPS_SOURCES}" STREQUAL "") AND (NOT "${QURT_BUNDLE_DSP_SOURCES}" STREQUAL ""))
 		# Add a rule to load the files onto the target
 		add_custom_target(${QURT_BUNDLE_APP_NAME}-load
 			DEPENDS ${QURT_BUNDLE_APP_NAME}_app-load lib${QURT_BUNDLE_APP_NAME}-load
