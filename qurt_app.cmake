@@ -74,7 +74,7 @@ function(QURT_BUNDLE)
 
 	if ("${APP_NAME}" STREQUAL "")
 		message(FATAL_ERROR "APP_NAME not specified in call to QURT_BUNDLE")
-	endif
+	endif()
 
 	message("APP_NAME = ${QURT_BUNDLE_APP_NAME}")
 
