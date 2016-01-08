@@ -94,7 +94,7 @@ function(QURT_BUNDLE)
 		GENERATED TRUE
 		)
 
-	if (NOT "${APPS_SOURCES} STREQUAL ")
+	if (NOT "${APPS_SOURCES}" STREQUAL "")
 		# Build lib that is run on the DSP invoked by RPC framework
 		# Set default install path of apps processor executable
 		if ("${QURT_BUNDLE_APPS_DEST}" STREQUAL "")
@@ -138,7 +138,7 @@ function(QURT_BUNDLE)
 			)
 		endif()
 
-	if (NOT "${DSP_SOURCES} STREQUAL ")
+	if (NOT "${DSP_SOURCES}" STREQUAL "")
 		message("DSP_INCS = ${QURT_BUNDLE_DSP_INCS}")
 
 		# Build lib that is run on the DSP
@@ -175,7 +175,7 @@ function(QURT_BUNDLE)
 			)
 		endif()
 
-	if (NOT "${APPS_SOURCES} STREQUAL " and NOT ${DSP_SOURCES} STREQUAL "")
+	if (NOT "${APPS_SOURCES}" STREQUAL "" and NOT "${DSP_SOURCES}" STREQUAL "")
 		# Add a rule to load the files onto the target
 		add_custom_target(${QURT_BUNDLE_APP_NAME}-load
 			DEPENDS ${QURT_BUNDLE_APP_NAME}_app-load lib${QURT_BUNDLE_APP_NAME}-load
