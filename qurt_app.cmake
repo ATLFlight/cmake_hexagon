@@ -145,7 +145,9 @@ function(QURT_BUNDLE)
 			${QURT_BUNDLE_DSP_SOURCES}
 			)
 
-		target_include_directories(${QURT_BUNDLE_APP_NAME} PUBLIC ${QURT_BUNDLE_DSP_INCS})
+		if (NOT "${QURT_BUNDLE_DSP_INCS}" STREQUAL "")
+			target_include_directories(${QURT_BUNDLE_APP_NAME} PUBLIC ${QURT_BUNDLE_DSP_INCS})
+		endif()
 
 		target_link_libraries(${QURT_BUNDLE_APP_NAME}
 			${QURT_BUNDLE_DSP_LINK_LIBS}
