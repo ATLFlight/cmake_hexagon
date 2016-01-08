@@ -127,7 +127,6 @@ function(QURT_BUNDLE)
 		add_custom_target(build_${QURT_BUNDLE_APP_NAME}_apps ALL
 			DEPENDS ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APP_NAME}_stub.c
 			)
-		add_dependencies(${QURT_BUNDLE_APP_NAME}_skel generate_${QURT_BUNDLE_APP_NAME}_stubs build_${QURT_BUNDLE_APP_NAME}_apps)
 
 		# Add a rule to load the files onto the target
 		add_custom_target(${QURT_BUNDLE_APP_NAME}_app-load
@@ -165,7 +164,7 @@ function(QURT_BUNDLE)
 
 		# Add a rule to load the files onto the target
 		add_custom_target(lib${QURT_BUNDLE_APP_NAME}-load
-			DEPENDS ${QURT_BUNDLE_APP_NAME} ${QURT_BUNDLE_APP_NAME}_skel
+			DEPENDS ${QURT_BUNDLE_APP_NAME}
 			COMMAND adb wait-for-devices
 			COMMAND adb push lib${QURT_BUNDLE_APP_NAME}_skel.so /usr/share/data/adsp/
 			COMMAND adb push lib${QURT_BUNDLE_APP_NAME}.so /usr/share/data/adsp/
