@@ -74,17 +74,6 @@ function(QURT_BUNDLE)
 
 	message("APP_NAME = ${QURT_BUNDLE_APP_NAME}")
 
-	# Build lib that is run on the DSP invoked by RPC framework
-	# Set default install path of apps processor executable
-	if ("${QURT_BUNDLE_APPS_DEST}" STREQUAL "")
-		set(QURT_BUNDLE_APPS_DEST "/home/linaro")
-	endif()
-
-	# Make sure apps compiler is provided
-	if ("${QURT_BUNDLE_APPS_COMPILER}" STREQUAL "")
-		message(FATAL_ERROR "APPS_COMPILER not specified in call to QURT_BUNDLE")
-	endif()
-
 	# Run the IDL compiler to generate the stubs
 	add_custom_command(
 		OUTPUT ${QURT_BUNDLE_APP_NAME}.h ${QURT_BUNDLE_APP_NAME}_skel.c ${QURT_BUNDLE_APP_NAME}_stub.c
@@ -105,63 +94,94 @@ function(QURT_BUNDLE)
 		GENERATED TRUE
 		)
 
-	message("DSP_INCS = ${QURT_BUNDLE_DSP_INCS}")
+	if (NOT "${APPS_SOURCES} STREQUAL ")
+		# Build lib that is run on the DSP invoked by RPC framework
+		# Set default install path of apps processor executable
+		if ("${QURT_BUNDLE_APPS_DEST}" STREQUAL "")
+			set(QURT_BUNDLE_APPS_DEST "/home/linaro")
+		endif()
 
-	# Build lib that is run on the DSP
-	add_library(${QURT_BUNDLE_APP_NAME} SHARED
-		${QURT_BUNDLE_DSP_SOURCES}
-		)
+		# Make sure apps compiler is provided
+		if ("${QURT_BUNDLE_APPS_COMPILER}" STREQUAL "")
+			message(FATAL_ERROR "APPS_COMPILER not specified in call to QURT_BUNDLE")
+		endif()
 
-	target_include_directories(${QURT_BUNDLE_APP_NAME} PUBLIC ${QURT_BUNDLE_DSP_INCS})
+		set(${APP_APP_NAME}_INCLUDE_DIRS 
+			-I${CMAKE_CURRENT_BINARY_DIR}
+			-I${HEXAGON_SDK_ROOT}/inc/stddef
+			-I${HEXAGON_SDK_ROOT}/lib/common/rpcmem
+			-I${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_Debug
+			-I${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug
+			${QURT_BUNDLE_APPS_INCS}
+			)
+		set(${APP_APP_NAME}_LINK_DIRS -L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc)
 
-	target_link_libraries(${QURT_BUNDLE_APP_NAME}
-		${QURT_BUNDLE_DSP_LINK_LIBS}
-		)
+		# Build the apps processor app and RPC stub using the provided ${QURT_BUNDLE_APPS_COMPILER}
+		add_custom_command(
+			OUTPUT ${QURT_BUNDLE_APP_NAME}_app
+			DEPENDS generate_${QURT_BUNDLE_APP_NAME}_stubs
+			COMMAND ${QURT_BUNDLE_APPS_COMPILER}  ${${APP_APP_NAME}_INCLUDE_DIRS} -o ${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME}_stub.c" ${${APP_APP_NAME}_LINK_DIRS}
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			)
 
-	add_dependencies(${QURT_BUNDLE_APP_NAME} generate_${QURT_BUNDLE_APP_NAME}_stubs)
+		add_custom_target(build_${QURT_BUNDLE_APP_NAME}_apps ALL
+			DEPENDS ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APP_NAME}_stub.c
+			)
+		add_dependencies(${QURT_BUNDLE_APP_NAME}_skel generate_${QURT_BUNDLE_APP_NAME}_stubs build_${QURT_BUNDLE_APP_NAME}_apps)
 
-	add_library(${QURT_BUNDLE_APP_NAME}_skel SHARED
-		${QURT_BUNDLE_APP_NAME}_skel.c
-		)
+		# Add a rule to load the files onto the target
+		add_custom_target(${QURT_BUNDLE_APP_NAME}_app-load
+			DEPENDS ${QURT_BUNDLE_APP_NAME}_app
+			COMMAND adb wait-for-devices
+			COMMAND adb push ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_DEST}
+			COMMAND echo "Pushed ${QURT_BUNDLE_APP_NAME}_app to ${QURT_BUNDLE_APPS_DEST}"
+			)
+		endif()
 
-	target_link_libraries(${QURT_BUNDLE_APP_NAME}_skel
-		${QURT_BUNDLE_APP_NAME}
-		)
+	if (NOT "${DSP_SOURCES} STREQUAL ")
+		message("DSP_INCS = ${QURT_BUNDLE_DSP_INCS}")
 
-	set(${APP_APP_NAME}_INCLUDE_DIRS 
-		-I${CMAKE_CURRENT_BINARY_DIR}
-		-I${HEXAGON_SDK_ROOT}/inc/stddef
-		-I${HEXAGON_SDK_ROOT}/lib/common/rpcmem
-		-I${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_Debug
-		-I${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug
-		${QURT_BUNDLE_APPS_INCS}
-		)
-	set(${APP_APP_NAME}_LINK_DIRS -L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc)
+		# Build lib that is run on the DSP
+		add_library(${QURT_BUNDLE_APP_NAME} SHARED
+			${QURT_BUNDLE_DSP_SOURCES}
+			)
 
-	# Build the apps processor app and RPC stub using the provided ${QURT_BUNDLE_APPS_COMPILER}
-	add_custom_command(
-		OUTPUT ${QURT_BUNDLE_APP_NAME}_app
-		DEPENDS generate_${QURT_BUNDLE_APP_NAME}_stubs
-		COMMAND ${QURT_BUNDLE_APPS_COMPILER}  ${${APP_APP_NAME}_INCLUDE_DIRS} -o ${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME}_stub.c" ${${APP_APP_NAME}_LINK_DIRS}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		)
+		target_include_directories(${QURT_BUNDLE_APP_NAME} PUBLIC ${QURT_BUNDLE_DSP_INCS})
 
-	add_custom_target(build_${QURT_BUNDLE_APP_NAME}_apps ALL
-		DEPENDS ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APP_NAME}_stub.c
-		)
+		target_link_libraries(${QURT_BUNDLE_APP_NAME}
+			${QURT_BUNDLE_DSP_LINK_LIBS}
+			)
 
-	add_dependencies(${QURT_BUNDLE_APP_NAME}_skel generate_${QURT_BUNDLE_APP_NAME}_stubs build_${QURT_BUNDLE_APP_NAME}_apps)
+		add_dependencies(${QURT_BUNDLE_APP_NAME} generate_${QURT_BUNDLE_APP_NAME}_stubs)
 
-	# Add a rule to load the files onto the target
-	add_custom_target(${QURT_BUNDLE_APP_NAME}-load
-		DEPENDS ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APP_NAME}
-		COMMAND adb wait-for-devices
-		COMMAND adb push lib${QURT_BUNDLE_APP_NAME}_skel.so /usr/share/data/adsp/
-		COMMAND adb push lib${QURT_BUNDLE_APP_NAME}.so /usr/share/data/adsp/
-		COMMAND adb push ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_DEST}
-		COMMAND adb push ${TOOLSLIB}/libgcc.so /usr/share/data/adsp/
-		COMMAND adb push ${TOOLSLIB}/libc.so /usr/share/data/adsp/
-		COMMAND echo "Pushed ${QURT_BUNDLE_APP_NAME}_app to ${QURT_BUNDLE_APPS_DEST}"
-		)
+		add_library(${QURT_BUNDLE_APP_NAME}_skel SHARED
+			${QURT_BUNDLE_APP_NAME}_skel.c
+			)
+
+		target_link_libraries(${QURT_BUNDLE_APP_NAME}_skel
+			${QURT_BUNDLE_APP_NAME}
+			)
+		add_dependencies(${QURT_BUNDLE_APP_NAME}_skel generate_${QURT_BUNDLE_APP_NAME}_stubs)
+
+		# Add a rule to load the files onto the target
+		add_custom_target(lib${QURT_BUNDLE_APP_NAME}-load
+			DEPENDS ${QURT_BUNDLE_APP_NAME} ${QURT_BUNDLE_APP_NAME}_skel
+			COMMAND adb wait-for-devices
+			COMMAND adb push lib${QURT_BUNDLE_APP_NAME}_skel.so /usr/share/data/adsp/
+			COMMAND adb push lib${QURT_BUNDLE_APP_NAME}.so /usr/share/data/adsp/
+			COMMAND adb push ${TOOLSLIB}/libgcc.so /usr/share/data/adsp/
+			COMMAND adb push ${TOOLSLIB}/libc.so /usr/share/data/adsp/
+			COMMAND echo "Pushed lib${QURT_BUNDLE_APP_NAME}.so to /usr/share/data/adsp/"
+			)
+		endif()
+
+	if (NOT "${APPS_SOURCES} STREQUAL " and NOT ${DSP_SOURCES} STREQUAL "")
+		# Add a rule to load the files onto the target
+		add_custom_target(${QURT_BUNDLE_APP_NAME}-load
+			DEPENDS ${QURT_BUNDLE_APP_NAME}_app-load lib${QURT_BUNDLE_APP_NAME}-load
+			COMMAND echo "Pushed ${QURT_BUNDLE_APP_NAME}"
+			)
+	endif()
+
 endfunction()
 
