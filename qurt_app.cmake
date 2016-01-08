@@ -72,6 +72,10 @@ function(QURT_BUNDLE)
 	set(multiValueArgs APPS_SOURCES APPS_LINK_LIBS APPS_INCS DSP_SOURCES DSP_LINK_LIBS DSP_INCS)
 	cmake_parse_arguments(QURT_BUNDLE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
+	if ("${APP_NAME}" STREQUAL "")
+		message(FATAL_ERROR "APP_NAME not specified in call to QURT_BUNDLE")
+	endif
+
 	message("APP_NAME = ${QURT_BUNDLE_APP_NAME}")
 
 	# Run the IDL compiler to generate the stubs
