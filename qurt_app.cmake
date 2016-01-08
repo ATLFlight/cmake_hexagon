@@ -149,6 +149,7 @@ function(QURT_BUNDLE)
 			target_include_directories(${QURT_BUNDLE_APP_NAME} PUBLIC ${QURT_BUNDLE_DSP_INCS})
 		endif()
 
+		message("QURT_BUNDLE_DSP_LINK_LIBS = ${QURT_BUNDLE_DSP_LINK_LIBS}")
 		target_link_libraries(${QURT_BUNDLE_APP_NAME}
 			${QURT_BUNDLE_DSP_LINK_LIBS}
 			)
