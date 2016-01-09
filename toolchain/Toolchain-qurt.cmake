@@ -150,7 +150,6 @@ set(ARCHCPUFLAGS
 	-m${V_ARCH}
 	-G0
 	-v
-	-fPIC
 	)
 
 add_definitions(
