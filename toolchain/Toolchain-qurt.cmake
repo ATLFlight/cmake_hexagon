@@ -93,6 +93,7 @@ set(HEXAGON_LINK  ${HEXAGON_BIN}/${CROSSDEV}link)
 set(HEXAGON_ARCH_FLAGS  
 	-march=hexagon
 	-mcpu=hexagonv5
+	-fPIC
 	)
 
 else()
