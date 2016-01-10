@@ -31,8 +31,14 @@
 #
 ############################################################################
 
-if ("${HEXAGON_TOOLS_ROOT}" STREQUAL "")
-	message(FATAL_ERROR "HEXAGON_TOOLS_ROOT not set")
+set(TOOLS_ERROR_MSG 
+		"The HexagonTools version 6.4.X or 7.2.X must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
+		"(e.g. export HEXAGON_TOOLS_ROOT=${HOME}/Qualcomm/HEXAGON_Tools/7.2.10/Tools)")
+
+if ("$ENV{HEXAGON_TOOLS_ROOT}" STREQUAL "")
+	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
+else()
+	set(HEXAGON_TOOLS_ROOT $ENV{HEXAGON_TOOLS_ROOT})
 endif()
 
 if ("$ENV{HEXAGON_SDK_ROOT}" STREQUAL "")
