@@ -57,6 +57,8 @@ include (CMakeParseArguments)
 # the RPC stubs are generated from a IDL complier (qaic). The RTOS on
 # the DSP is QuRT but is often abstraced by the DSPAL APIs.
 #
+# The default idl file is <APP_NAME>.idl
+#
 # QURT_BUNDLE is used to specify the files and libraries to build
 # in the DSP lib and in the apps application. The generated stubs are
 # automatically build into the appropriate target.
@@ -68,7 +70,7 @@ include (CMakeParseArguments)
 #
 function(QURT_BUNDLE)
 	set(options)
-	set(oneValueArgs APP_NAME APPS_COMPILER APPS_DEST)
+	set(oneValueArgs APP_NAME IDL_FILE APPS_COMPILER APPS_DEST)
 	set(multiValueArgs APPS_SOURCES APPS_LINK_LIBS APPS_INCS DSP_SOURCES DSP_LINK_LIBS DSP_INCS)
 	cmake_parse_arguments(QURT_BUNDLE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -76,24 +78,30 @@ function(QURT_BUNDLE)
 		message(FATAL_ERROR "APP_NAME not specified in call to QURT_BUNDLE")
 	endif()
 
+	if ("${QURT_BUNDLE_IDL_FILE}" STREQUAL "")
+		set(QURT_BUNDLE_IDL ${CMAKE_CURRENT_SOURCE_DIR}/${QURT_BUNDLE_APP_NAME}.idl)
+	endif()
+
+	get_filename_component(QURT_BUNDLE_IDL_NAME ${QURT_BUNDLE_IDL_FILE} NAME_WE)
+
 	message("APP_NAME = ${QURT_BUNDLE_APP_NAME}")
 
 	# Run the IDL compiler to generate the stubs
 	add_custom_command(
-		OUTPUT ${QURT_BUNDLE_APP_NAME}.h ${QURT_BUNDLE_APP_NAME}_skel.c ${QURT_BUNDLE_APP_NAME}_stub.c
-		DEPENDS ${QURT_BUNDLE_APP_NAME}.idl
-		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/inc/stddef" "${CMAKE_CURRENT_SOURCE_DIR}/${QURT_BUNDLE_APP_NAME}.idl"
+		OUTPUT ${QURT_BUNDLE_IDL_NAME}.h ${QURT_BUNDLE_IDL_NAME}_skel.c ${QURT_BUNDLE_IDL_NAME}_stub.c
+		DEPENDS ${QURT_BUNDLE_IDL_FILE}
+		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/inc/stddef" "${QURT_BUNDLE_IDL_FILE}"
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		)
 
-	add_custom_target(generate_${QURT_BUNDLE_APP_NAME}_stubs ALL
-		DEPENDS ${QURT_BUNDLE_APP_NAME}.h ${QURT_BUNDLE_APP_NAME}_skel.c ${QURT_BUNDLE_APP_NAME}_stub.c
+	add_custom_target(generate_${QURT_BUNDLE_IDL_NAME}_stubs ALL
+		DEPENDS ${QURT_BUNDLE_IDL_NAME}.h ${QURT_BUNDLE_IDL_NAME}_skel.c ${QURT_BUNDLE_IDL_NAME}_stub.c
 		)
 
 	set_source_files_properties(
-		${QURT_BUNDLE_APP_NAME}.h
-		${QURT_BUNDLE_APP_NAME}_skel.c
-		${QURT_BUNDLE_APP_NAME}_stub.c
+		${QURT_BUNDLE_IDL_NAME}.h
+		${QURT_BUNDLE_IDL_NAME}_skel.c
+		${QURT_BUNDLE_IDL_NAME}_stub.c
 		PROPERTIES
 		GENERATED TRUE
 		)
@@ -124,15 +132,15 @@ function(QURT_BUNDLE)
 		# Build the apps processor app and RPC stub using the provided ${QURT_BUNDLE_APPS_COMPILER}
 		add_custom_command(
 			OUTPUT ${QURT_BUNDLE_APP_NAME}_app
-			DEPENDS generate_${QURT_BUNDLE_APP_NAME}_stubs
-			COMMAND ${QURT_BUNDLE_APPS_COMPILER}  ${${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS} -o ${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME}_stub.c" ${${QURT_BUNDLE_APP_NAME}_LINK_DIRS}
+			DEPENDS generate_${QURT_BUNDLE_IDL_NAME}_stubs
+			COMMAND ${QURT_BUNDLE_APPS_COMPILER}  ${${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS} -o ${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_IDL_NAME}_stub.c" ${${QURT_BUNDLE_APP_NAME}_LINK_DIRS}
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			)
 
 		add_custom_target(build_${QURT_BUNDLE_APP_NAME}_apps ALL
-			DEPENDS ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APP_NAME}_stub.c
+			DEPENDS ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_IDL_NAME}_stub.c
 			)
-		add_dependencies(build_${QURT_BUNDLE_APP_NAME}_apps generate_${QURT_BUNDLE_APP_NAME}_stubs)
+		add_dependencies(build_${QURT_BUNDLE_APP_NAME}_apps generate_${QURT_BUNDLE_IDL_NAME}_stubs)
 
 		# Add a rule to load the files onto the target
 		add_custom_target(${QURT_BUNDLE_APP_NAME}_app-load
@@ -161,30 +169,30 @@ function(QURT_BUNDLE)
 			${QURT_BUNDLE_DSP_LINK_LIBS}
 			)
 
-		add_dependencies(${QURT_BUNDLE_APP_NAME} generate_${QURT_BUNDLE_APP_NAME}_stubs)
+		add_dependencies(${QURT_BUNDLE_APP_NAME} generate_${QURT_BUNDLE_IDL_NAME}_stubs)
 
-		add_library(${QURT_BUNDLE_APP_NAME}_skel SHARED
-			${QURT_BUNDLE_APP_NAME}_skel.c
+		add_library(${QURT_BUNDLE_IDL_NAME}_skel SHARED
+			${QURT_BUNDLE_IDL_NAME}_skel.c
 			)
 
-		target_link_libraries(${QURT_BUNDLE_APP_NAME}_skel
+		target_link_libraries(${QURT_BUNDLE_IDL_NAME}_skel
 			${QURT_BUNDLE_APP_NAME}
 			)
-		add_dependencies(${QURT_BUNDLE_APP_NAME}_skel generate_${QURT_BUNDLE_APP_NAME}_stubs)
+		add_dependencies(${QURT_BUNDLE_IDL_NAME}_skel generate_${QURT_BUNDLE_IDL_NAME}_stubs)
 
 		add_custom_target(build_${QURT_BUNDLE_APP_NAME}_dsp ALL
-			DEPENDS ${QURT_BUNDLE_APP_NAME} ${QURT_BUNDLE_APP_NAME}_skel
+			DEPENDS ${QURT_BUNDLE_APP_NAME} ${QURT_BUNDLE_IDL_NAME}_skel
 			)
 
 		# Add a rule to load the files onto the target
 		add_custom_target(lib${QURT_BUNDLE_APP_NAME}-load
 			DEPENDS ${QURT_BUNDLE_APP_NAME}
 			COMMAND adb wait-for-devices
-			COMMAND adb push lib${QURT_BUNDLE_APP_NAME}_skel.so /usr/share/data/adsp/
+			COMMAND adb push lib${QURT_BUNDLE_IDL_NAME}_skel.so /usr/share/data/adsp/
 			COMMAND adb push lib${QURT_BUNDLE_APP_NAME}.so /usr/share/data/adsp/
 			COMMAND adb push ${TOOLSLIB}/libgcc.so /usr/share/data/adsp/
 			COMMAND adb push ${TOOLSLIB}/libc.so /usr/share/data/adsp/
-			COMMAND echo "Pushed lib${QURT_BUNDLE_APP_NAME}.so to /usr/share/data/adsp/"
+			COMMAND echo "Pushed lib${QURT_BUNDLE_APP_NAME}.so and dependencies to /usr/share/data/adsp/"
 			)
 		endif()
 
