@@ -153,14 +153,9 @@ set(ARCHCPUFLAGS
 	)
 
 add_definitions(
-	-D__DF_QURT
+	-D__QURT
 	-D_PID_T -D_UID_T -D_TIMER_T
-	-Dnoreturn_function=
 	-D_HAS_C9X
-	-D__EXPORT=
-	-Drestrict=
-	-D_DEBUG
-	-Wno-error=shadow
 	)
 
 # optimisation flags
@@ -168,57 +163,19 @@ add_definitions(
 set(ARCHOPTIMIZATION
 	-O0
 	-g
-	-fno-strict-aliasing
-	-fdata-sections
-	-fno-zero-initialized-in-bss
 	)
 
 # Language-specific flags
 #
 set(ARCHCFLAGS
-	-std=gnu99
 	-D__CUSTOM_FILE_IO__
 	)
+
 set(ARCHCXXFLAGS
-	-fno-exceptions
-	-fno-rtti
-	-std=c++11
-	-fno-threadsafe-statics
 	-DCONFIG_WCHAR_BUILTIN
 	-D__CUSTOM_FILE_IO__
 	)
 
-set(ARCHWARNINGS
-	-Wall
-	-Wextra
-	-Werror
-	-Wno-unused-parameter
-	-Wno-unused-function
-	-Wno-unused-variable
-	-Wno-gnu-array-member-paren-init
-	-Wno-cast-align
-	-Wno-missing-braces
-	-Wno-strict-aliasing
-#   -Werror=float-conversion - works, just needs to be phased in with some effort and needs GCC 4.9+
-#   -Wcast-qual  - generates spurious noreturn attribute warnings, try again later
-#   -Wconversion - would be nice, but too many "risky-but-safe" conversions in the code
-#   -Wcast-align - would help catch bad casts in some cases, but generates too many false positives
-	)
-
-# C-specific warnings
-#
-set(ARCHCWARNINGS
-	${ARCHWARNINGS}
-	-Wstrict-prototypes
-	-Wnested-externs
-	)
-
-# C++-specific warnings
-#
-set(ARCHWARNINGSXX
-	${ARCHWARNINGS}
-	-Wno-missing-field-initializers
-	)
 exec_program(${CMAKE_CXX_COMPILER} ${CMAKE_CURRENT_SOURCE_DIR} ARGS -print-libgcc-file-name OUTPUT_VARIABLE LIBGCC)
 exec_program(${CMAKE_CXX_COMPILER} ${CMAKE_CURRENT_SOURCE_DIR} ARGS -print-file-name=libm.a OUTPUT_VARIABLE LIBM)
 set(EXTRA_LIBS ${EXTRA_LIBS} ${LIBM})
@@ -227,14 +184,8 @@ set(EXTRA_LIBS ${EXTRA_LIBS} ${LIBM})
 #
 list2string(CFLAGS
 	${ARCHCFLAGS}
-	${ARCHCWARNINGS}
 	${ARCHOPTIMIZATION}
 	${ARCHCPUFLAGS}
-	${ARCHINCLUDES}
-	${INSTRUMENTATIONDEFINES}
-	${ARCHDEFINES}
-	${EXTRADEFINES}
-	${EXTRACFLAGS}
 	${HEXAGON_INCLUDE_DIRS}
 	)
 
@@ -242,14 +193,8 @@ list2string(CFLAGS
 #
 list2string(CXXFLAGS
 	${ARCHCXXFLAGS}
-	${ARCHWARNINGSXX}
 	${ARCHOPTIMIZATION}
 	${ARCHCPUFLAGS}
-	${ARCHXXINCLUDES}
-	${INSTRUMENTATIONDEFINES}
-	${ARCHDEFINES}
-	${EXTRADEFINES}
-	${EXTRACXXFLAGS}
 	${HEXAGON_INCLUDE_DIRS}
 	)
 
@@ -258,8 +203,6 @@ list2string(CXXFLAGS
 list2string(AFLAGS
 	${CFLAGS}
 	-D__ASSEMBLY__
-	${EXTRADEFINES}
-	${EXTRAAFLAGS}
 	)
 
 # Set cmake flags
