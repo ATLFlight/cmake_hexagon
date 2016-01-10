@@ -149,7 +149,6 @@ set(DYNAMIC_LIBS -Wl,${TOOLSLIB}/libstdc++.a)
 set(ARCHCPUFLAGS
 	-m${V_ARCH}
 	-G0
-	-v
 	)
 
 add_definitions(
