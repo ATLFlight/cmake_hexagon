@@ -162,7 +162,6 @@ add_definitions(
 #
 set(ARCHOPTIMIZATION
 	-O0
-	-g
 	)
 
 # Language-specific flags
@@ -228,7 +227,6 @@ set(CMAKE_CXX_FLAGS ${QURT_CMAKE_CXX_FLAGS} CACHE STRING "cxxflags")
 # dynamic libraries and invoked via FastRPC
 # These settings enable CMake to build the required test apps
 list2string(CMAKE_EXE_LINKER_FLAGS
-	-g
 	-mv5
 	-mG0lib
 	-G0
