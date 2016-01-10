@@ -156,6 +156,7 @@ add_definitions(
 	-D__QURT
 	-D_PID_T -D_UID_T -D_TIMER_T
 	-D_HAS_C9X
+	-Drestrict=
 	)
 
 # optimisation flags
