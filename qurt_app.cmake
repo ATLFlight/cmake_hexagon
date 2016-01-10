@@ -98,6 +98,7 @@ function(QURT_BUNDLE)
 		GENERATED TRUE
 		)
 
+	# Process Apps processor files
 	if (NOT "${QURT_BUNDLE_APPS_SOURCES}" STREQUAL "")
 		# Build lib that is run on the DSP invoked by RPC framework
 		# Set default install path of apps processor executable
@@ -131,6 +132,7 @@ function(QURT_BUNDLE)
 		add_custom_target(build_${QURT_BUNDLE_APP_NAME}_apps ALL
 			DEPENDS ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APP_NAME}_stub.c
 			)
+		add_dependencies(build_${QURT_BUNDLE_APP_NAME}_apps generate_${QURT_BUNDLE_APP_NAME}_stubs)
 
 		# Add a rule to load the files onto the target
 		add_custom_target(${QURT_BUNDLE_APP_NAME}_app-load
@@ -139,8 +141,9 @@ function(QURT_BUNDLE)
 			COMMAND adb push ${QURT_BUNDLE_APP_NAME}_app ${QURT_BUNDLE_APPS_DEST}
 			COMMAND echo "Pushed ${QURT_BUNDLE_APP_NAME}_app to ${QURT_BUNDLE_APPS_DEST}"
 			)
-		endif()
+	endif()
 
+	# Process DSP files
 	if (NOT "${QURT_BUNDLE_DSP_SOURCES}" STREQUAL "")
 		message("DSP_INCS = ${QURT_BUNDLE_DSP_INCS}")
 
@@ -169,6 +172,10 @@ function(QURT_BUNDLE)
 			)
 		add_dependencies(${QURT_BUNDLE_APP_NAME}_skel generate_${QURT_BUNDLE_APP_NAME}_stubs)
 
+		add_custom_target(build_${QURT_BUNDLE_APP_NAME}_dsp ALL
+			DEPENDS ${QURT_BUNDLE_APP_NAME} ${QURT_BUNDLE_APP_NAME}_skel
+			)
+
 		# Add a rule to load the files onto the target
 		add_custom_target(lib${QURT_BUNDLE_APP_NAME}-load
 			DEPENDS ${QURT_BUNDLE_APP_NAME}
@@ -181,6 +188,7 @@ function(QURT_BUNDLE)
 			)
 		endif()
 
+	# Create a target to load both Apps and DSP code on the target
 	if ((NOT "${QURT_BUNDLE_APPS_SOURCES}" STREQUAL "") AND (NOT "${QURT_BUNDLE_DSP_SOURCES}" STREQUAL ""))
 		# Add a rule to load the files onto the target
 		add_custom_target(${QURT_BUNDLE_APP_NAME}-load
