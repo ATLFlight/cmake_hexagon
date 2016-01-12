@@ -148,11 +148,13 @@ set(ARCHCPUFLAGS
 	)
 
 add_definitions(
-	-D__QURT
-	-D_PID_T -D_UID_T -D_TIMER_T
-	-D_HAS_C9X
-	-Drestrict=
-	-Dnoreturn_function=
+	-D __QURT
+	-D _PID_T
+	-D _UID_T
+	-D _TIMER_T
+	-D _HAS_C9X
+	-D restrict=
+	-D noreturn_function=
 	)
 
 # optimisation flags
