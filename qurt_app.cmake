@@ -179,7 +179,7 @@ function (QURT_LIB)
 	message("QURT_LIB_LINK_LIBS = ${QURT_LIB_LINK_LIBS}")
 
 	target_link_libraries(${QURT_LIB_APP_NAME}
-		${QURT_LIB_APP_NAME}
+		${QURT_LIB_LINK_LIBS}
 		)
 
 	add_dependencies(${QURT_LIB_APP_NAME} generate_${QURT_LIB_IDL_NAME}_stubs)
