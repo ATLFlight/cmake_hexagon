@@ -87,7 +87,11 @@ set(FASTRPC_ARM_LINUX_INCLUDES
 
 set(FASTRPC_ARM_LIBS -L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc)
 	
-function (FASTRPC_STUB_GEN IDLFILE)
+include_directories(
+	${CMAKE_CURRENT_BINARY_DIR}
+	)
+
+macro(FASTRPC_STUB_GEN IDLFILE)
 	get_filename_component(FASTRPC_IDL_NAME ${IDLFILE} NAME_WE)
 	get_filename_component(FASTRPC_IDL_PATH ${IDLFILE} ABSOLUTE)
 
@@ -103,10 +107,6 @@ function (FASTRPC_STUB_GEN IDLFILE)
 		DEPENDS ${FASTRPC_IDL_NAME}.h ${FASTRPC_IDL_NAME}_skel.c ${FASTRPC_IDL_NAME}_stub.c
 		)
 
-	include_directories(
-		${CMAKE_CURRENT_BINARY_DIR}
-		)
-
 	set_source_files_properties(
 		${FASTRPC_IDL_NAME}.h
 		${FASTRPC_IDL_NAME}_skel.c
@@ -114,7 +114,7 @@ function (FASTRPC_STUB_GEN IDLFILE)
 		PROPERTIES
 		GENERATED TRUE
 		)
-endfunction()
+endmacro()
 
 include (CMakeParseArguments)
 
@@ -174,7 +174,8 @@ function (QURT_LIB)
 		target_include_directories(${QURT_LIB_APP_NAME} PUBLIC ${QURT_LIB_INCS})
 	endif()
 
-	message("QURT_BUNDLE_DSP_LINK_LIBS = ${QURT_BUNDLE_DSP_LINK_LIBS}")
+	message("QURT_LIB_LINK_LIBS = ${QURT_LIB_LINK_LIBS}")
+
 	target_link_libraries(${QURT_LIB_APP_NAME}
 		${QURT_LIB_APP_NAME}
 		)
@@ -186,7 +187,7 @@ function (QURT_LIB)
 		)
 
 	target_link_libraries(${QURT_LIB_IDL_NAME}_skel
-		${QURT_BUNDLE_APP_NAME}
+		${QURT_LIB_APP_NAME}
 		)
 	add_dependencies(${QURT_LIB_IDL_NAME}_skel generate_${QURT_LIB_IDL_NAME}_stubs)
 
