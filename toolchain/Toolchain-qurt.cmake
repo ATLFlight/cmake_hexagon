@@ -136,10 +136,6 @@ set(CMAKE_C_CREATE_SHARED_LIBRARY
 set(CMAKE_CXX_CREATE_SHARED_LIBRARY
 	"${HEXAGON_LINK} ${HEXAGON_START_LINK_FLAGS} --start-group --whole-archive <OBJECTS> <LINK_LIBRARIES> --no-whole-archive ${TOOLSLIB}/libstdc++.a --end-group ${HEXAGON_END_LINK_FLAGS}")
 
-list2string(HEXAGON_INCLUDE_DIRS
-	-I${CMAKE_SOURCE_DIR}/external/dspal/include
-	)
-
 set(DYNAMIC_LIBS -Wl,${TOOLSLIB}/libstdc++.a)
 
 #set(MAXOPTIMIZATION -O0)
