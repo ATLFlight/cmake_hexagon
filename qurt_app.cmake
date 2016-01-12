@@ -91,7 +91,7 @@ include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
 	)
 
-macro(FASTRPC_STUB_GEN IDLFILE)
+function(FASTRPC_STUB_GEN IDLFILE)
 	get_filename_component(FASTRPC_IDL_NAME ${IDLFILE} NAME_WE)
 	get_filename_component(FASTRPC_IDL_PATH ${IDLFILE} ABSOLUTE)
 
@@ -102,6 +102,8 @@ macro(FASTRPC_STUB_GEN IDLFILE)
 		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/inc/stddef" "${FASTRPC_IDL_PATH}"
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		)
+
+	message("Generated generate_${FASTRPC_IDL_NAME}_stubs target")
 
 	add_custom_target(generate_${FASTRPC_IDL_NAME}_stubs ALL
 		DEPENDS ${FASTRPC_IDL_NAME}.h ${FASTRPC_IDL_NAME}_skel.c ${FASTRPC_IDL_NAME}_stub.c
@@ -114,7 +116,7 @@ macro(FASTRPC_STUB_GEN IDLFILE)
 		PROPERTIES
 		GENERATED TRUE
 		)
-endmacro()
+endfunction()
 
 include (CMakeParseArguments)
 
