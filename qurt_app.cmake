@@ -121,18 +121,17 @@ endfunction()
 include (CMakeParseArguments)
 
 function (FASTRPC_ARM_APP_DEPS_GEN)
-	set(oneValueArgs APP_NAME IDL_NAME APPS_DEST)
-	set(multiValueArgs APPS_SOURCES APPS_LINK_LIBS APPS_INCS DSP_SOURCES DSP_LINK_LIBS DSP_INCS)
+	set(oneValueArgs APP_NAME IDL_NAME APP_DEST)
 	cmake_parse_arguments(FASTRPC_ARM_APP_DEPS_GEN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
 	# Build lib that is run on the DSP invoked by RPC framework
 	# Set default install path of apps processor executable
-	if ("${FASTRPC_ARM_APP_DEPS_GEN_APPS_DEST}" STREQUAL "")
-		set(FASTRPC_ARM_APP_DEPS_GEN_APPS_DEST "/home/linaro")
+	if ("${FASTRPC_ARM_APP_DEPS_GEN_APP_DEST}" STREQUAL "")
+		set(FASTRPC_ARM_APP_DEPS_GEN_APP_DEST "/home/linaro")
 	endif()
 
 	add_custom_target(build_${FASTRPC_ARM_APP_DEPS_GEN_APP_NAME}_apps ALL
-		DEPENDS ${FASTRPC_ARM_APP_DEPS_GEN_APP_NAME}_app ${FASTRPC_ARM_APP_DEPS_GEN_IDL_NAME}_stub.c
+		DEPENDS ${FASTRPC_ARM_APP_DEPS_GEN_APP_NAME} ${FASTRPC_ARM_APP_DEPS_GEN_IDL_NAME}_stub.c
 		)
 	add_dependencies(build_${FASTRPC_ARM_APP_DEPS_GEN_APP_NAME}_apps generate_${FASTRPC_ARM_APP_DEPS_GEN_IDL_NAME}_stubs)
 
@@ -140,7 +139,7 @@ function (FASTRPC_ARM_APP_DEPS_GEN)
 	add_custom_target(${FASTRPC_ARM_APP_DEPS_GEN_APP_NAME}_app-load
 		DEPENDS ${FASTRPC_ARM_APP_DEPS_GEN_APP_NAME}_app
 		COMMAND adb wait-for-devices
-		COMMAND adb push ${FASTRPC_ARM_APP_DEPS_GEN_APP_NAME}_app ${FASTRPC_ARM_APP_DEPS_GEN_APPS_DEST}
+		COMMAND adb push ${FASTRPC_ARM_APP_DEPS_GEN_APP_NAME}_app ${FASTRPC_ARM_APP_DEPS_GEN_APP_DEST}
 		COMMAND echo "Pushed ${FASTRPC_ARM_APP_DEPS_GEN_APP_NAME}_app to ${FASTRPC_ARM_APP_DEPS_GEN_APP_NAME}"
 		)
 endfunction()
@@ -209,6 +208,49 @@ function (QURT_LIB)
 		)
 endfunction()
 
+# Process Apps proc app source and libs
+function (QURT_APP)
+	set(oneValueArgs APP_NAME IDL_NAME APP_DEST)
+	set(multiValueArgs SOURCES LINK_LIBS INCS)
+	cmake_parse_arguments(QURT_APP "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+	if ("${QURT_APP_SOURCES}" STREQUAL "")
+		message(FATAL_ERROR "QURT_APP called without SOURCES")
+	endif()
+
+	if ("${QURT_APP_IDL_NAME}" STREQUAL "")
+		message(FATAL_ERROR "QURT_APP called without IDL_NAME")
+	endif()
+
+	include_directories(
+		${CMAKE_CURRENT_BINARY_DIR}
+		${FASTRPC_DSP_INCLUDES}
+		)
+
+	message("QURT_APP_INCS = ${QURT_APP_INCS}")
+
+	# Build lib that is run on the DSP
+	add_executable(${QURT_APP_APP_NAME}
+		${QURT_APP_SOURCES}
+		)
+
+	if (NOT "${QURT_APP_INCS}" STREQUAL "")
+		target_include_directories(${QURT_APP_APP_NAME} PUBLIC ${QURT_APP_INCS})
+	endif()
+
+	message("QURT_APP_LINK_LIBS = ${QURT_APP_LINK_LIBS}")
+
+	target_link_libraries(${QURT_APP_APP_NAME}
+		${QURT_APP_LINK_LIBS}
+		)
+
+	FASTRPC_ARM_APP_DEPS_GEN(
+		APP_NAME ${QURT_APP_APP_NAME}
+		IDL_NAME ${QURT_APP_IDL_NAME}
+		APP_DEST ${QURT_APP_APP_DEST})
+
+endfunction()
+
 #
 # Hexagon apps are started from an app running on the apps processor 
 # of the SoC. An RPC mechanism is used to load the app on the DSP and
@@ -228,7 +270,7 @@ endfunction()
 #
 function(QURT_BUNDLE)
 	set(options)
-	set(oneValueArgs APP_NAME IDL_FILE APPS_COMPILER APPS_DEST)
+	set(oneValueArgs APP_NAME IDL_FILE APPS_COMPILER APP_DEST)
 	set(multiValueArgs APPS_SOURCES APPS_LINK_LIBS APPS_INCS DSP_SOURCES DSP_LINK_LIBS DSP_INCS)
 	cmake_parse_arguments(QURT_BUNDLE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -273,7 +315,7 @@ function(QURT_BUNDLE)
 		FASTRPC_ARM_APP_DEPS_GEN(
 			APP_NAME ${QURT_BUNDLE_APP_NAME}
 			IDL_NAME ${QURT_BUNDLE_IDL_NAME}
-			APPS_DEST ${QURT_BUNDLE_APPS_DEST}	
+			APP_DEST ${QURT_BUNDLE_APP_DEST}	
 			)
 
 	endif()
