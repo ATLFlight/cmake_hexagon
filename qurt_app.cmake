@@ -85,7 +85,10 @@ set(FASTRPC_ARM_LINUX_INCLUDES
 	-I${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug
 	)
 
-set(FASTRPC_ARM_LIBS -L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc)
+set(FASTRPC_ARM_LIBS 
+	-L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc
+	${HEXAGON_SDK_ROOT}/lib/common/rpcmem/UbuntuARM_Debug/rpcmem.a
+	)
 	
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
