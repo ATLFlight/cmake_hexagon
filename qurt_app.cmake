@@ -205,8 +205,6 @@ function (QURT_LIB)
 		COMMAND adb wait-for-devices
 		COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/
 		COMMAND adb push lib${QURT_LIB_APP_NAME}.so /usr/share/data/adsp/
-		COMMAND adb push ${TOOLSLIB}/libgcc.so /usr/share/data/adsp/
-		COMMAND adb push ${TOOLSLIB}/libc.so /usr/share/data/adsp/
 		COMMAND echo "Pushed lib${QURT_LIB_APP_NAME}.so and dependencies to /usr/share/data/adsp/"
 		)
 endfunction()
@@ -322,7 +320,7 @@ function(QURT_BUNDLE)
 			)
 	endif()
 
-	if (NOT "${QURT_BUNDLE_APPS_SOURCES}" STREQUAL "")
+	if (NOT "${QURT_BUNDLE_DSP_SOURCES}" STREQUAL "")
 		QURT_LIB(APP_NAME ${QURT_BUNDLE_APP_NAME}
 			IDL_NAME ${QURT_BUNDLE_IDL_NAME}
 			SOURCES ${QURT_BUNDLE_DSP_SOURCES}
