@@ -186,7 +186,7 @@ function (QURT_LIB)
 
 	add_dependencies(${QURT_LIB_APP_NAME} generate_${QURT_LIB_IDL_NAME}_stubs)
 
-	add_library(${QURT_LIB_IDL_NAME}_skel SHARED
+	add_library(${QURT_LIB_IDL_NAME}_skel MODULE
 		${QURT_LIB_IDL_NAME}_skel.c
 		)
 
