@@ -153,7 +153,7 @@ add_definitions(
 	-D _UID_T
 	-D _TIMER_T
 	-D _HAS_C9X
-	-D restrict=
+	-D restrict=__restrict__
 	-D noreturn_function=
 	)
 
