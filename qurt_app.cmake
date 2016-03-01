@@ -151,12 +151,8 @@ endfunction()
 function (QURT_LIB)
 	set(options)
 	set(oneValueArgs APP_NAME IDL_NAME)
-	set(multiValueArgs SOURCES LINK_LIBS INCS)
+	set(multiValueArgs SOURCES LINK_LIBS INCS FLAGS)
 	cmake_parse_arguments(QURT_LIB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-
-	if ("${QURT_LIB_SOURCES}" STREQUAL "")
-		message(FATAL_ERROR "QURT_LIB called without SOURCES")
-	endif()
 
 	if ("${QURT_LIB_IDL_NAME}" STREQUAL "")
 		message(FATAL_ERROR "QURT_LIB called without IDL_NAME")
@@ -169,30 +165,44 @@ function (QURT_LIB)
 
 	message("QURT_LIB_INCS = ${QURT_LIB_INCS}")
 
-	# Build lib that is run on the DSP
-	add_library(${QURT_LIB_APP_NAME} SHARED
-		${QURT_LIB_SOURCES}
-		)
+	if (NOT "${QURT_LIB_SOURCES}" STREQUAL "")
 
-	if (NOT "${QURT_LIB_INCS}" STREQUAL "")
-		target_include_directories(${QURT_LIB_APP_NAME} PUBLIC ${QURT_LIB_INCS})
+		# Build lib that is run on the DSP
+		add_library(${QURT_LIB_APP_NAME} SHARED
+			${QURT_LIB_SOURCES}
+			)
+
+		if (NOT "${QURT_LIB_FLAGS}" STREQUAL "")
+			set_target_properties(${QURT_LIB_APP_NAME} PROPERTIES COMPILE_FLAGS "${QURT_LIB_FLAGS}")
+		endif()
+
+		if (NOT "${QURT_LIB_INCS}" STREQUAL "")
+			target_include_directories(${QURT_LIB_APP_NAME} PUBLIC ${QURT_LIB_INCS})
+		endif()
+
+		message("QURT_LIB_LINK_LIBS = ${QURT_LIB_LINK_LIBS}")
+
+		target_link_libraries(${QURT_LIB_APP_NAME}
+			${QURT_LIB_LINK_LIBS}
+			)
+
+		add_dependencies(${QURT_LIB_APP_NAME} generate_${QURT_LIB_IDL_NAME}_stubs)
+
 	endif()
-
-	message("QURT_LIB_LINK_LIBS = ${QURT_LIB_LINK_LIBS}")
-
-	target_link_libraries(${QURT_LIB_APP_NAME}
-		${QURT_LIB_LINK_LIBS}
-		)
-
-	add_dependencies(${QURT_LIB_APP_NAME} generate_${QURT_LIB_IDL_NAME}_stubs)
 
 	add_library(${QURT_LIB_IDL_NAME}_skel MODULE
 		${QURT_LIB_IDL_NAME}_skel.c
 		)
 
-	target_link_libraries(${QURT_LIB_IDL_NAME}_skel
-		${QURT_LIB_APP_NAME}
-		)
+	if (NOT "${QURT_LIB_SOURCES}" STREQUAL "")
+		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
+			${QURT_LIB_APP_NAME}
+			)
+	else()
+		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
+			${QURT_LIB_LINK_LIBS}
+			)
+	endif()
 	add_dependencies(${QURT_LIB_IDL_NAME}_skel generate_${QURT_LIB_IDL_NAME}_stubs)
 
 	add_custom_target(build_${QURT_LIB_APP_NAME}_dsp ALL
