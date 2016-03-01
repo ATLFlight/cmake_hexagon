@@ -150,7 +150,7 @@ endfunction()
 # Process DSP files
 function (QURT_LIB)
 	set(options)
-	set(oneValueArgs APP_NAME IDL_NAME)
+	set(oneValueArgs LIB_NAME IDL_NAME)
 	set(multiValueArgs SOURCES LINK_LIBS INCS FLAGS)
 	cmake_parse_arguments(QURT_LIB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -168,25 +168,25 @@ function (QURT_LIB)
 	if (NOT "${QURT_LIB_SOURCES}" STREQUAL "")
 
 		# Build lib that is run on the DSP
-		add_library(${QURT_LIB_APP_NAME} SHARED
+		add_library(${QURT_LIB_LIB_NAME} SHARED
 			${QURT_LIB_SOURCES}
 			)
 
 		if (NOT "${QURT_LIB_FLAGS}" STREQUAL "")
-			set_target_properties(${QURT_LIB_APP_NAME} PROPERTIES COMPILE_FLAGS "${QURT_LIB_FLAGS}")
+			set_target_properties(${QURT_LIB_LIB_NAME} PROPERTIES COMPILE_FLAGS "${QURT_LIB_FLAGS}")
 		endif()
 
 		if (NOT "${QURT_LIB_INCS}" STREQUAL "")
-			target_include_directories(${QURT_LIB_APP_NAME} PUBLIC ${QURT_LIB_INCS})
+			target_include_directories(${QURT_LIB_LIB_NAME} PUBLIC ${QURT_LIB_INCS})
 		endif()
 
 		message("QURT_LIB_LINK_LIBS = ${QURT_LIB_LINK_LIBS}")
 
-		target_link_libraries(${QURT_LIB_APP_NAME}
+		target_link_libraries(${QURT_LIB_LIB_NAME}
 			${QURT_LIB_LINK_LIBS}
 			)
 
-		add_dependencies(${QURT_LIB_APP_NAME} generate_${QURT_LIB_IDL_NAME}_stubs)
+		add_dependencies(${QURT_LIB_LIB_NAME} generate_${QURT_LIB_IDL_NAME}_stubs)
 
 	endif()
 
@@ -196,7 +196,7 @@ function (QURT_LIB)
 
 	if (NOT "${QURT_LIB_SOURCES}" STREQUAL "")
 		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
-			${QURT_LIB_APP_NAME}
+			${QURT_LIB_LIB_NAME}
 			)
 	else()
 		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
@@ -205,17 +205,17 @@ function (QURT_LIB)
 	endif()
 	add_dependencies(${QURT_LIB_IDL_NAME}_skel generate_${QURT_LIB_IDL_NAME}_stubs)
 
-	add_custom_target(build_${QURT_LIB_APP_NAME}_dsp ALL
+	add_custom_target(build_${QURT_LIB_LIB_NAME}_dsp ALL
 		DEPENDS ${QURT_LIB_IDL_NAME} ${QURT_LIB_IDL_NAME}_skel
 		)
 
 	# Add a rule to load the files onto the target that run in the DSP
-	add_custom_target(lib${QURT_LIB_APP_NAME}-load
-		DEPENDS ${QURT_LIB_APP_NAME}
+	add_custom_target(lib${QURT_LIB_LIB_NAME}-load
+		DEPENDS ${QURT_LIB_LIB_NAME}
 		COMMAND adb wait-for-devices
 		COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/
-		COMMAND adb push lib${QURT_LIB_APP_NAME}.so /usr/share/data/adsp/
-		COMMAND echo "Pushed lib${QURT_LIB_APP_NAME}.so and dependencies to /usr/share/data/adsp/"
+		COMMAND adb push lib${QURT_LIB_LIB_NAME}.so /usr/share/data/adsp/
+		COMMAND echo "Pushed lib${QURT_LIB_LIB_NAME}.so and dependencies to /usr/share/data/adsp/"
 		)
 endfunction()
 
@@ -331,7 +331,7 @@ function(QURT_BUNDLE)
 	endif()
 
 	if (NOT "${QURT_BUNDLE_DSP_SOURCES}" STREQUAL "")
-		QURT_LIB(APP_NAME ${QURT_BUNDLE_APP_NAME}
+		QURT_LIB(LIB_NAME ${QURT_BUNDLE_APP_NAME}
 			IDL_NAME ${QURT_BUNDLE_IDL_NAME}
 			SOURCES ${QURT_BUNDLE_DSP_SOURCES}
 			LINK_LIBS ${QURT_BUNDLE_DSP_LINK_LIBS}
