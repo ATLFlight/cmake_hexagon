@@ -41,19 +41,6 @@
 #	HEXAGON_TOOLS_ROOT
 #	HEXAGON_SDK_ROOT
 #
-# USAGE:
-#
-# For simple DSP apps that use a simple apps processor app to invoke the
-# DSP lib, the QURT_BUNDLE function can be used.
-#
-# When the apps proc app requires its own cmake build, the RPC stub functions
-# can be generated with FASTRPC_STUB_GEN. The DSP lib can be built with the
-# QURT_LIB function and the apps proc app can be built with the help of the
-# the FASTRPC_ARM_APP_DEPS_GEN function.
-#
-# Build targets to load the apps proc app and DSP libs are created from the
-# rules below. Look for resulting make targets ending in -load.
-
 
 set(TOOLS_ERROR_MSG 
 		"The HexagonTools version 6.4.X or 7.2.X must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"

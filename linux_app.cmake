@@ -54,7 +54,7 @@
 # Build targets to load the apps proc app and libs are created from the
 # rules below. Look for resulting make targets ending in -load.
 
-include(fastrpc.cmake)
+include(fastrpc)
 
 include(CMakeParseArguments)
 
@@ -154,6 +154,7 @@ function (LINUX_APP)
 	# Build lib that is run on the DSP
 	add_executable(${LINUX_APP_APP_NAME}
 		${LINUX_APP_SOURCES}
+		${LINUX_APP_IDL_NAME}_stub.c
 		)
 
 	if (NOT "${LINUX_APP_INCS}" STREQUAL "")
@@ -164,12 +165,10 @@ function (LINUX_APP)
 
 	target_link_libraries(${LINUX_APP_APP_NAME}
 		${LINUX_APP_LINK_LIBS}
+		${FASTRPC_ARM_LIBS}
 		)
 
-	add_custom_target(build_${LINUX_APP_APP_NAME}_apps ALL
-		DEPENDS ${LINUX_APP_APP_NAME} ${LINUX_APP_IDL_NAME}_stub.c
-		)
-	add_dependencies(build_${LINUX_APP_APP_NAME}_apps generate_${LINUX_APP_IDL_NAME}_stubs)
+	add_dependencies(${LINUX_APP_APP_NAME} generate_${LINUX_APP_IDL_NAME}_stubs)
 
 	FASTRPC_ARM_LINUX_LOAD(
 		LOADNAME ${LINUX_APP_APP_NAME}

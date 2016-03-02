@@ -54,8 +54,9 @@
 # Build targets to load the apps proc app and DSP libs are created from the
 # rules below. Look for resulting make targets ending in -load.
 
-include(fastrpc.cmake)
-include(qurt_app.cmake)
+include(fastrpc)
+include(qurt_lib)
+include(linux_app)
 
 #
 # Hexagon apps are started from an app running on the apps processor 
@@ -118,10 +119,11 @@ function(QURT_BUNDLE)
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			)
 
-		FASTRPC_ARM_APP_DEPS_GEN(
-			APP_NAME ${QURT_BUNDLE_APP_NAME}_app
-			IDL_NAME ${QURT_BUNDLE_IDL_NAME}
-			APP_DEST ${QURT_BUNDLE_APP_DEST}	
+		FASTRPC_ARM_LINUX_LOAD(
+			LOADNAME ${QURT_BUNDLE_APP_NAME}_app
+			TARGET ${QURT_BUNDLE_APP_NAME}_app
+			DEPNAME ${QURT_BUNDLE_APP_NAME}_app
+			DEST ${QURT_BUNDLE_APP_DEST}	
 			)
 	endif()
 
