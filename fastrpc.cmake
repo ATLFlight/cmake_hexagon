@@ -54,79 +54,70 @@
 # Build targets to load the apps proc app and DSP libs are created from the
 # rules below. Look for resulting make targets ending in -load.
 
-include(fastrpc)
 
-include (CMakeParseArguments)
+set(TOOLS_ERROR_MSG 
+		"The HexagonTools version 6.4.X or 7.2.X must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
+		"(e.g. export HEXAGON_TOOLS_ROOT=$ENV{HOME}/Qualcomm/HEXAGON_Tools/7.2.10/Tools)")
 
-# Process DSP files
-function (QURT_LIB)
-	set(options)
-	set(oneValueArgs LIB_NAME IDL_NAME)
-	set(multiValueArgs SOURCES LINK_LIBS INCS FLAGS)
-	cmake_parse_arguments(QURT_LIB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+if ("$ENV{HEXAGON_TOOLS_ROOT}" STREQUAL "")
+	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
+else()
+	set(HEXAGON_TOOLS_ROOT $ENV{HEXAGON_TOOLS_ROOT})
+endif()
 
-	if ("${QURT_LIB_IDL_NAME}" STREQUAL "")
-		message(FATAL_ERROR "QURT_LIB called without IDL_NAME")
-	endif()
+if ("$ENV{HEXAGON_SDK_ROOT}" STREQUAL "")
+	message(FATAL_ERROR "HEXAGON_SDK_ROOT not set")
+endif()
 
-	include_directories(
-		${CMAKE_CURRENT_BINARY_DIR}
-		${FASTRPC_DSP_INCLUDES}
+set(HEXAGON_SDK_ROOT $ENV{HEXAGON_SDK_ROOT})
+
+set(FASTRPC_DSP_INCLUDES
+	${HEXAGON_SDK_ROOT}/inc
+	${HEXAGON_SDK_ROOT}/inc/stddef
+	${HEXAGON_SDK_ROOT}/lib/common/rpcmem
+	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/hexagon_Debug
+	)
+
+set(FASTRPC_ARM_LINUX_INCLUDES
+	-I${HEXAGON_SDK_ROOT}/inc/stddef
+	-I${HEXAGON_SDK_ROOT}/lib/common/rpcmem
+	-I${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_Debug
+	-I${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug
+	)
+
+set(FASTRPC_ARM_LIBS 
+	-L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc
+	${HEXAGON_SDK_ROOT}/lib/common/rpcmem/UbuntuARM_Debug/rpcmem.a
+	)
+	
+include_directories(
+	${CMAKE_CURRENT_BINARY_DIR}
+	)
+
+function(FASTRPC_STUB_GEN IDLFILE)
+	get_filename_component(FASTRPC_IDL_NAME ${IDLFILE} NAME_WE)
+	get_filename_component(FASTRPC_IDL_PATH ${IDLFILE} ABSOLUTE)
+
+	# Run the IDL compiler to generate the stubs
+	add_custom_command(
+		OUTPUT ${FASTRPC_IDL_NAME}.h ${FASTRPC_IDL_NAME}_skel.c ${FASTRPC_IDL_NAME}_stub.c
+		DEPENDS ${FASTRPC_IDL_PATH}
+		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/inc/stddef" "${FASTRPC_IDL_PATH}"
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		)
 
-	message("QURT_LIB_INCS = ${QURT_LIB_INCS}")
+	message("Generated generate_${FASTRPC_IDL_NAME}_stubs target")
 
-	if (NOT "${QURT_LIB_SOURCES}" STREQUAL "")
-
-		# Build lib that is run on the DSP
-		add_library(${QURT_LIB_LIB_NAME} SHARED
-			${QURT_LIB_SOURCES}
-			)
-
-		if (NOT "${QURT_LIB_FLAGS}" STREQUAL "")
-			set_target_properties(${QURT_LIB_LIB_NAME} PROPERTIES COMPILE_FLAGS "${QURT_LIB_FLAGS}")
-		endif()
-
-		if (NOT "${QURT_LIB_INCS}" STREQUAL "")
-			target_include_directories(${QURT_LIB_LIB_NAME} PUBLIC ${QURT_LIB_INCS})
-		endif()
-
-		message("QURT_LIB_LINK_LIBS = ${QURT_LIB_LINK_LIBS}")
-
-		target_link_libraries(${QURT_LIB_LIB_NAME}
-			${QURT_LIB_LINK_LIBS}
-			)
-
-		add_dependencies(${QURT_LIB_LIB_NAME} generate_${QURT_LIB_IDL_NAME}_stubs)
-
-	endif()
-
-	add_library(${QURT_LIB_IDL_NAME}_skel MODULE
-		${QURT_LIB_IDL_NAME}_skel.c
+	add_custom_target(generate_${FASTRPC_IDL_NAME}_stubs ALL
+		DEPENDS ${FASTRPC_IDL_NAME}.h ${FASTRPC_IDL_NAME}_skel.c ${FASTRPC_IDL_NAME}_stub.c
 		)
 
-	if (NOT "${QURT_LIB_SOURCES}" STREQUAL "")
-		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
-			${QURT_LIB_LIB_NAME}
-			)
-	else()
-		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
-			${QURT_LIB_LINK_LIBS}
-			)
-	endif()
-	add_dependencies(${QURT_LIB_IDL_NAME}_skel generate_${QURT_LIB_IDL_NAME}_stubs)
-
-	add_custom_target(build_${QURT_LIB_LIB_NAME}_dsp ALL
-		DEPENDS ${QURT_LIB_IDL_NAME} ${QURT_LIB_IDL_NAME}_skel
-		)
-
-	# Add a rule to load the files onto the target that run in the DSP
-	add_custom_target(lib${QURT_LIB_LIB_NAME}-load
-		DEPENDS ${QURT_LIB_LIB_NAME}
-		COMMAND adb wait-for-devices
-		COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/
-		COMMAND adb push lib${QURT_LIB_LIB_NAME}.so /usr/share/data/adsp/
-		COMMAND echo "Pushed lib${QURT_LIB_LIB_NAME}.so and dependencies to /usr/share/data/adsp/"
+	set_source_files_properties(
+		${FASTRPC_IDL_NAME}.h
+		${FASTRPC_IDL_NAME}_skel.c
+		${FASTRPC_IDL_NAME}_stub.c
+		PROPERTIES
+		GENERATED TRUE
 		)
 endfunction()
 
