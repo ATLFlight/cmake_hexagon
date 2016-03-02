@@ -66,16 +66,19 @@ set(FASTRPC_DSP_INCLUDES
 	)
 
 set(FASTRPC_ARM_LINUX_INCLUDES
-	-I${HEXAGON_SDK_ROOT}/inc/stddef
-	-I${HEXAGON_SDK_ROOT}/lib/common/rpcmem
-	-I${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_Debug
-	-I${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug
+	${HEXAGON_SDK_ROOT}/inc
+	${HEXAGON_SDK_ROOT}/inc/stddef
+	${HEXAGON_SDK_ROOT}/lib/common/rpcmem
+	${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_Debug
+	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug
 	)
 
 set(FASTRPC_ARM_LIBS 
 	-L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc
 	${HEXAGON_SDK_ROOT}/lib/common/rpcmem/UbuntuARM_Debug/rpcmem.a
 	)
+
+set(ADSPMSGD ${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_Debug/adspmsgd.a)
 	
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}

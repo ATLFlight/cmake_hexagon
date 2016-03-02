@@ -82,7 +82,7 @@ function (LINUX_LIB)
 	set(options)
 	set(oneValueArgs LIB_NAME IDL_NAME LIB_DEST)
 	set(multiValueArgs SOURCES LINK_LIBS INCS FLAGS)
-	cmake_parse_arguments(QURT_LIB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+	cmake_parse_arguments(LINUX_LIB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
 	if ("${LINUX_LIB_IDL_NAME}" STREQUAL "")
 		message(FATAL_ERROR "LINUX_LIB called without IDL_NAME")
@@ -93,7 +93,7 @@ function (LINUX_LIB)
 		${FASTRPC_ARM_LINUX_INCLUDES}
 		)
 
-	message("QURT_LIB_INCS = ${QURT_LIB_INCS}")
+	#message("LINUX_LIB_INCS = ${LINUX_LIB_INCS}")
 
 	if (NOT "${LINUX_LIB_SOURCES}" STREQUAL "")
 
@@ -111,7 +111,7 @@ function (LINUX_LIB)
 			target_include_directories(${LINUX_LIB_LIB_NAME} PUBLIC ${LINUX_LIB_INCS})
 		endif()
 
-		message("LINUX_LIB_LINK_LIBS = ${LINUX_LIB_LINK_LIBS}")
+		#message("LINUX_LIB_LINK_LIBS = ${LINUX_LIB_LINK_LIBS}")
 
 		target_link_libraries(${LINUX_LIB_LIB_NAME}
 			${LINUX_LIB_LINK_LIBS}
@@ -146,10 +146,10 @@ function (LINUX_APP)
 
 	include_directories(
 		${CMAKE_CURRENT_BINARY_DIR}
-		${FASTRPC_DSP_INCLUDES}
+		${FASTRPC_ARM_LINUX_INCLUDES}
 		)
 
-	message("LINUX_APP_INCS = ${LINUX_APP_INCS}")
+	#message("LINUX_APP_INCS = ${LINUX_APP_INCS}")
 
 	# Build lib that is run on the DSP
 	add_executable(${LINUX_APP_APP_NAME}
@@ -161,7 +161,7 @@ function (LINUX_APP)
 		target_include_directories(${LINUX_APP_APP_NAME} PUBLIC ${LINUX_APP_INCS})
 	endif()
 
-	message("LINUX_APP_LINK_LIBS = ${LINUX_APP_LINK_LIBS}")
+	#message("LINUX_APP_LINK_LIBS = ${LINUX_APP_LINK_LIBS}")
 
 	target_link_libraries(${LINUX_APP_APP_NAME}
 		${LINUX_APP_LINK_LIBS}

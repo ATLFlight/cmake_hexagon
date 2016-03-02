@@ -116,17 +116,28 @@ function (QURT_LIB)
 	endif()
 	add_dependencies(${QURT_LIB_IDL_NAME}_skel generate_${QURT_LIB_IDL_NAME}_stubs)
 
-	add_custom_target(build_${QURT_LIB_LIB_NAME}_dsp ALL
-		DEPENDS ${QURT_LIB_IDL_NAME} ${QURT_LIB_IDL_NAME}_skel
-		)
+	#message("Making custom target build_${QURT_LIB_LIB_NAME}_dsp")
+	#add_custom_target(build_${QURT_LIB_LIB_NAME}_dsp ALL
+	#	DEPENDS ${QURT_LIB_IDL_NAME} ${QURT_LIB_IDL_NAME}_skel
+	#	)
 
-	# Add a rule to load the files onto the target that run in the DSP
-	add_custom_target(lib${QURT_LIB_LIB_NAME}-load
-		DEPENDS ${QURT_LIB_LIB_NAME}
-		COMMAND adb wait-for-devices
-		COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/
-		COMMAND adb push lib${QURT_LIB_LIB_NAME}.so /usr/share/data/adsp/
-		COMMAND echo "Pushed lib${QURT_LIB_LIB_NAME}.so and dependencies to /usr/share/data/adsp/"
-		)
+	if ("${QURT_LIB_LIB_NAME}" STREQUAL "")
+		# Add a rule to load the files onto the target that run in the DSP
+		add_custom_target(lib${QURT_LIB_IDL_NAME}_skel-load
+			DEPENDS ${QURT_LIB_IDL_NAME}_skel
+			COMMAND adb wait-for-devices
+			COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/
+			COMMAND echo "Pushed lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/"
+			)
+	else()
+		# Add a rule to load the files onto the target that run in the DSP
+		add_custom_target(lib${QURT_LIB_LIB_NAME}-load
+			DEPENDS ${QURT_LIB_LIB_NAME} ${QURT_LIB_IDL_NAME}_skel
+			COMMAND adb wait-for-devices
+			COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/
+			COMMAND adb push lib${QURT_LIB_LIB_NAME}.so /usr/share/data/adsp/
+			COMMAND echo "Pushed lib${QURT_LIB_LIB_NAME}.so and dependencies to /usr/share/data/adsp/"
+			)
+	endif()
 endfunction()
 
