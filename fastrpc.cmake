@@ -42,6 +42,14 @@
 #	HEXAGON_SDK_ROOT
 #
 
+if("${RELEASE}" STREQUAL "")
+	set(RELEASE Debug)
+endif()
+
+if(NOT ("${RELEASE}" STREQUAL "Debug" OR "${RELEASE}" STREQUAL "Release"))
+	message(FATAL "RELEASE must be set to Debug or Release")
+endif()
+
 set(TOOLS_ERROR_MSG 
 		"The HexagonTools version 6.4.X or 7.2.X must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
 		"(e.g. export HEXAGON_TOOLS_ROOT=$ENV{HOME}/Qualcomm/HEXAGON_Tools/7.2.10/Tools)")
@@ -62,23 +70,26 @@ set(FASTRPC_DSP_INCLUDES
 	${HEXAGON_SDK_ROOT}/inc
 	${HEXAGON_SDK_ROOT}/inc/stddef
 	${HEXAGON_SDK_ROOT}/lib/common/rpcmem
-	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/hexagon_Debug
+	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/hexagon_${RELEASE}
 	)
 
 set(FASTRPC_ARM_LINUX_INCLUDES
 	${HEXAGON_SDK_ROOT}/inc
 	${HEXAGON_SDK_ROOT}/inc/stddef
 	${HEXAGON_SDK_ROOT}/lib/common/rpcmem
-	${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_Debug
-	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug
+	${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_${RELEASE}
+	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_${RELEASE}
 	)
+
+set(ADSPRPC "-L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc")
+set(ADSPMSGD ${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
+set(RPCMEM ${HEXAGON_SDK_ROOT}/lib/common/rpcmem/UbuntuARM_${RELEASE}/rpcmem.a)
 
 set(FASTRPC_ARM_LIBS 
-	-L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_Debug -ladsprpc
-	${HEXAGON_SDK_ROOT}/lib/common/rpcmem/UbuntuARM_Debug/rpcmem.a
+	${ADSPRPC}
+	${RPCMEM}
 	)
 
-set(ADSPMSGD ${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_Debug/adspmsgd.a)
 	
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
