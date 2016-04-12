@@ -81,7 +81,7 @@ set(FASTRPC_ARM_LINUX_INCLUDES
 	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_${RELEASE}
 	)
 
-set(ADSPRPC "-L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc")
+set(ADSPRPC -L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
 set(ADSPMSGD ${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
 set(RPCMEM ${HEXAGON_SDK_ROOT}/lib/common/rpcmem/UbuntuARM_${RELEASE}/rpcmem.a)
 
