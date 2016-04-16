@@ -104,7 +104,7 @@ function (LINUX_LIB)
 			)
 
 		if (NOT "${LINUX_LIB_FLAGS}" STREQUAL "")
-			set_target_properties(${QURT_LIB_LIB_NAME} PROPERTIES COMPILE_FLAGS "${QURT_LIB_FLAGS}")
+			set_target_properties(${LINUX_LIB_LIB_NAME} PROPERTIES COMPILE_FLAGS "${LINUX_LIB_FLAGS}")
 		endif()
 
 		if (NOT "${LINUX_LIB_INCS}" STREQUAL "")
@@ -115,6 +115,7 @@ function (LINUX_LIB)
 
 		target_link_libraries(${LINUX_LIB_LIB_NAME}
 			${LINUX_LIB_LINK_LIBS}
+			${FASTRPC_ARM_LIBS}
 			)
 
 		add_dependencies(${LINUX_LIB_LIB_NAME} generate_${LINUX_LIB_IDL_NAME}_stubs)
