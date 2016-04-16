@@ -58,6 +58,49 @@ include(fastrpc)
 
 include (CMakeParseArguments)
 
+function (QURT_LIB_STANDALONE)
+	set(options)
+	set( oneValueArgs LIB_NAME )
+	set( multiValueArgs SOURCES LINK_LIBS INCS FLAGS )
+	cmake_parse_arguments(QURT_LIB_STANDALONE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+	if( "${QURT_LIB_STANDALONE_LIB_NAME}" STREQUAL "" )
+		message( FATAL_ERROR "QURT_LIB_STANDALONE called without a target name" )
+	endif()
+
+	message( "QURT_LIB_STANDALONE_LIB_NAME = ${QURT_LIB_STANDALONE_LIB_NAME}" )
+
+	include_directories(
+		${CMAKE_CURRENT_BINARY_DIR}
+		${FASTRPC_DSP_INCLUDES}
+		)
+
+	add_library( ${QURT_LIB_STANDALONE_LIB_NAME} SHARED ${QURT_LIB_STANDALONE_SOURCES} )
+	set_property(TARGET ${QURT_LIB_STANDALONE_LIB_NAME} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+
+  if(NOT ${QURT_LIB_STANDALONE_LIBS} STREQUAL "" )
+		target_link_libraries( ${QURT_LIB_STANDALONE_LIB_NAME} ${QURT_LIB_STANDALONE_LIBS} )
+	endif()
+
+	target_include_directories(${QURT_LIB_STANDALONE_LIB_NAME} PUBLIC
+ 	   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/>
+ 	   $<INSTALL_INTERFACE:include>)
+
+	target_include_directories(${QURT_LIB_STANDALONE_LIB_NAME} PUBLIC
+ 	   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include/>
+ 	   $<INSTALL_INTERFACE:include>) 	   
+
+	install(TARGETS ${QURT_LIB_STANDALONE_LIB_NAME}
+	   EXPORT ${QURT_LIB_STANDALONE_LIB_NAME}-targets
+	   ARCHIVE DESTINATION lib
+	   LIBRARY DESTINATION lib
+	   RUNTIME DESTINATION bin)
+
+	install(EXPORT ${QURT_LIB_STANDALONE_LIB_NAME}-targets
+	  FILE ${QURT_LIB_STANDALONE_LIB_NAME}-config.cmake
+	  DESTINATION lib/cmake/${QURT_LIB_STANDALONE_LIB_NAME})
+
+endfunction()
+
 # Process DSP files
 function (QURT_LIB)
 	set(options)
