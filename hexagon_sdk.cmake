@@ -42,8 +42,8 @@
 #
 
 set(TOOLS_ERROR_MSG 
-		"The HexagonTools version 6.4.X or 7.2.X must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
-		"(e.g. export HEXAGON_TOOLS_ROOT=$ENV{HOME}/Qualcomm/HEXAGON_Tools/7.2.10/Tools)")
+		"The HexagonTools version 7.2.X must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
+		"(e.g. export HEXAGON_TOOLS_ROOT=$ENV{HOME}/Qualcomm/HEXAGON_Tools/7.2.12/Tools)")
 
 if ("$ENV{HEXAGON_TOOLS_ROOT}" STREQUAL "")
 	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
@@ -55,10 +55,25 @@ if ("$ENV{HEXAGON_SDK_ROOT}" STREQUAL "")
 	message(FATAL_ERROR "HEXAGON_SDK_ROOT not set")
 endif()
 
+if ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/2.0")
+	set(SDKINC inc)
+	set(SDKLIB lib)
+elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.0")
+	set(SDKINC incs)
+	set(SDKLIB libs)
+else()
+        message(FATAL_ERROR "Unsupported/Unknown HEXAGON SDK version")
+endif()
+
+
 set(HEXAGON_SDK_ROOT $ENV{HEXAGON_SDK_ROOT})
 
 set(HEXAGON_SDK_INCLUDES
-	${HEXAGON_SDK_ROOT}/incs
-	${HEXAGON_SDK_ROOT}/incs/stddef
+	${HEXAGON_SDK_ROOT}/${SDKINC}
+	${HEXAGON_SDK_ROOT}/${SDKINC}/stddef
+	)
+
+set(HEXAGON_8074_INCLUDES
+	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/qurt/ADSPv5MP/include
 	)
 
