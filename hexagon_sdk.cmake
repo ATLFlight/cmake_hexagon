@@ -58,7 +58,7 @@ endif()
 set(HEXAGON_SDK_ROOT $ENV{HEXAGON_SDK_ROOT})
 
 set(HEXAGON_SDK_INCLUDES
-	${HEXAGON_SDK_ROOT}/inc
-	${HEXAGON_SDK_ROOT}/inc/stddef
+	${HEXAGON_SDK_ROOT}/incs
+	${HEXAGON_SDK_ROOT}/incs/stddef
 	)
 

@@ -54,20 +54,20 @@ endif()
 
 set(FASTRPC_DSP_INCLUDES
 	${HEXAGON_SDK_INCLUDES}
-	${HEXAGON_SDK_ROOT}/lib/common/rpcmem
-	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/hexagon_${RELEASE}
+	${HEXAGON_SDK_ROOT}/libs/common/rpcmem
+	${HEXAGON_SDK_ROOT}/libs/common/remote/ship/hexagon_${RELEASE}
 	)
 
 set(FASTRPC_ARM_LINUX_INCLUDES
 	${HEXAGON_SDK_INCLUDES}
-	${HEXAGON_SDK_ROOT}/lib/common/rpcmem
-	${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_${RELEASE}
-	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_${RELEASE}
+	${HEXAGON_SDK_ROOT}/libs/common/rpcmem
+	${HEXAGON_SDK_ROOT}/libs/common/adspmsgd/ship/UbuntuARM_${RELEASE}
+	${HEXAGON_SDK_ROOT}/libs/common/remote/ship/UbuntuARM_${RELEASE}
 	)
 
-set(ADSPRPC -L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
-set(ADSPMSGD ${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
-set(RPCMEM ${HEXAGON_SDK_ROOT}/lib/common/rpcmem/UbuntuARM_${RELEASE}/rpcmem.a)
+set(ADSPRPC -L${HEXAGON_SDK_ROOT}/libs/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
+set(ADSPMSGD ${HEXAGON_SDK_ROOT}/libs/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
+set(RPCMEM ${HEXAGON_SDK_ROOT}/libs/common/rpcmem/UbuntuARM_${RELEASE}/rpcmem.a)
 
 set(FASTRPC_ARM_LIBS 
 	${ADSPRPC}
