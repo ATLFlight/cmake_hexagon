@@ -87,7 +87,7 @@ function(FASTRPC_STUB_GEN IDLFILE)
 	add_custom_command(
 		OUTPUT ${FASTRPC_IDL_NAME}.h ${FASTRPC_IDL_NAME}_skel.c ${FASTRPC_IDL_NAME}_stub.c
 		DEPENDS ${FASTRPC_IDL_PATH}
-		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/inc/stddef" "${FASTRPC_IDL_PATH}"
+		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/incs/stddef" "${FASTRPC_IDL_PATH}"
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		)
 
