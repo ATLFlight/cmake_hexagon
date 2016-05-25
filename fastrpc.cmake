@@ -54,20 +54,20 @@ endif()
 
 set(FASTRPC_DSP_INCLUDES
 	${HEXAGON_SDK_INCLUDES}
-	${HEXAGON_SDK_ROOT}/lib/common/rpcmem
-	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/hexagon_${RELEASE}
+	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem
+	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/hexagon_${RELEASE}
 	)
 
 set(FASTRPC_ARM_LINUX_INCLUDES
 	${HEXAGON_SDK_INCLUDES}
-	${HEXAGON_SDK_ROOT}/lib/common/rpcmem
-	${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_${RELEASE}
-	${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_${RELEASE}
+	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem
+	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE}
+	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE}
 	)
 
-set(ADSPRPC -L${HEXAGON_SDK_ROOT}/lib/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
-set(ADSPMSGD ${HEXAGON_SDK_ROOT}/lib/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
-set(RPCMEM ${HEXAGON_SDK_ROOT}/lib/common/rpcmem/UbuntuARM_${RELEASE}/rpcmem.a)
+set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
+set(ADSPMSGD ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
+set(RPCMEM ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem/UbuntuARM_${RELEASE}/rpcmem.a)
 
 set(FASTRPC_ARM_LIBS 
 	${ADSPRPC}
@@ -87,7 +87,7 @@ function(FASTRPC_STUB_GEN IDLFILE)
 	add_custom_command(
 		OUTPUT ${FASTRPC_IDL_NAME}.h ${FASTRPC_IDL_NAME}_skel.c ${FASTRPC_IDL_NAME}_stub.c
 		DEPENDS ${FASTRPC_IDL_PATH}
-		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/inc/stddef" "${FASTRPC_IDL_PATH}"
+		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef" "${FASTRPC_IDL_PATH}"
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		)
 
