@@ -55,7 +55,7 @@ endif()
 if ("$ENV{HEXAGON_ARM_SYSROOT}" STREQUAL "")
         message(FATAL_ERROR "HEXAGON_ARM_SYSROOT not set")
 else()
-        set(HEXAGON_TOOLS_ROOT $ENV{HEXAGON_ARM_SYSROOT})
+        set(HEXAGON_ARM_SYSROOT $ENV{HEXAGON_ARM_SYSROOT})
 endif()
 
 # this one is important
@@ -106,11 +106,8 @@ foreach(tool echo patch grep rm mkdir nm genromfs cp touch make unzip)
 	endif()
 endforeach()
 
-set(C_FLAGS "--sysroot=${HEXAGON_ARM_SYSROOT}")
-set(LINKER_FLAGS "-Wl,-gc-sections")
-set(CMAKE_EXE_LINKER_FLAGS ${LINKER_FLAGS})
-set(CMAKE_C_FLAGS ${C_FLAGS})
-set(CMAKE_CXX_LINKER_FLAGS ${C_FLAGS})
+set(CMAKE_SYSROOT ${HEXAGON_ARM_SYSROOT})
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,-gc-sections -Wl,-rpath-link,${HEXAGON_ARM_SYSROOT}/usr/lib/arm-linux-gnueabihf -Wl,-rpath-link,${HEXAGON_ARM_SYSROOT}/lib/arm-linux-gnueabihf")
 
 # where is the target environment
 set(CMAKE_FIND_ROOT_PATH  get_file_component(${C_COMPILER} PATH))
