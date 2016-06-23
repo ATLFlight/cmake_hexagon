@@ -71,7 +71,7 @@ function(FASTRPC_ARM_LINUX_LOAD)
 	# Add a rule to load the file onto the target
 	add_custom_target(${FASTRPC_ARM_LINUX_LOAD_LOADNAME}-load
 		DEPENDS ${FASTRPC_ARM_LINUX_LOAD_DEPNAME}
-		COMMAND adb wait-for-devices
+		COMMAND adb wait-for-device
 		COMMAND adb push ${FASTRPC_ARM_LINUX_LOAD_TARGET} ${FASTRPC_ARM_LINUX_LOAD_DEST}
 		COMMAND echo "Pushed ${FASTRPC_ARM_LINUX_LOAD_TARGET} to ${FASTRPC_ARM_LINUX_LOAD_DEST}"
 		)
