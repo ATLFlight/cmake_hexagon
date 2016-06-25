@@ -125,7 +125,7 @@ function (QURT_LIB)
 		# Add a rule to load the files onto the target that run in the DSP
 		add_custom_target(lib${QURT_LIB_IDL_NAME}_skel-load
 			DEPENDS ${QURT_LIB_IDL_NAME}_skel
-			COMMAND adb wait-for-devices
+			COMMAND adb wait-for-device
 			COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/
 			COMMAND echo "Pushed lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/"
 			)
@@ -133,7 +133,7 @@ function (QURT_LIB)
 		# Add a rule to load the files onto the target that run in the DSP
 		add_custom_target(lib${QURT_LIB_LIB_NAME}-load
 			DEPENDS ${QURT_LIB_LIB_NAME} ${QURT_LIB_IDL_NAME}_skel
-			COMMAND adb wait-for-devices
+			COMMAND adb wait-for-device
 			COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/
 			COMMAND adb push lib${QURT_LIB_LIB_NAME}.so /usr/share/data/adsp/
 			COMMAND echo "Pushed lib${QURT_LIB_LIB_NAME}.so and dependencies to /usr/share/data/adsp/"
