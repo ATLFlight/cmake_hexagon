@@ -34,8 +34,8 @@ include(CMakeForceCompiler)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(TOOLS_ERROR_MSG 
-		"The HexagonTools version 6.4.X or 7.2.X must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
-		"(e.g. export HEXAGON_TOOLS_ROOT=${HOME}/Qualcomm/HEXAGON_Tools/7.2.10/Tools)")
+		"The HexagonTools version 7.2.12 must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
+		"(e.g. export HEXAGON_TOOLS_ROOT=${HOME}/Qualcomm/HEXAGON_Tools/7.2.12/Tools)")
 
 if ("$ENV{HEXAGON_TOOLS_ROOT}" STREQUAL "")
 	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
@@ -57,7 +57,7 @@ set(CROSSDEV "hexagon-")
 # Detect compiler version
 if(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/6.4.")
 
-# Use the HexagonTools compiler (6.4.06)
+# Use the HexagonTools compiler (6.4.06) - This is deprecated
 set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/qc/bin)
 set(HEXAGON_GNU_BIN ${HEXAGON_TOOLS_ROOT}/gnu/bin)
 set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
@@ -76,7 +76,7 @@ set(HEXAGON_ARCH_FLAGS  -march=hexagonv5)
 
 elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
 
-# Use the HexagonTools compiler (7.2.X)
+# Use the HexagonTools compiler (7.2.12) from Hexagon 3.0 SDK
 set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/bin)
 set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
 set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
@@ -157,12 +157,6 @@ add_definitions(
 	-D noreturn_function=
 	)
 
-# optimisation flags
-#
-set(ARCHOPTIMIZATION
-	-O0
-	)
-
 # Language-specific flags
 #
 set(ARCHCFLAGS
@@ -182,7 +176,6 @@ set(EXTRA_LIBS ${EXTRA_LIBS} ${LIBM})
 #
 list2string(CFLAGS
 	${ARCHCFLAGS}
-	${ARCHOPTIMIZATION}
 	${ARCHCPUFLAGS}
 	${HEXAGON_INCLUDE_DIRS}
 	)
@@ -191,7 +184,6 @@ list2string(CFLAGS
 #
 list2string(CXXFLAGS
 	${ARCHCXXFLAGS}
-	${ARCHOPTIMIZATION}
 	${ARCHCPUFLAGS}
 	${HEXAGON_INCLUDE_DIRS}
 	)
