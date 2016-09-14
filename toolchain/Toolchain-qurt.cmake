@@ -34,8 +34,8 @@ include(CMakeForceCompiler)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(TOOLS_ERROR_MSG
-		"The HexagonTools version 7.2.12 must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
-		"(e.g. export HEXAGON_TOOLS_ROOT=${HOME}/Qualcomm/HEXAGON_Tools/7.2.12/Tools)")
+	"The HexagonTools version 7.2.12 must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
+	"(e.g. export HEXAGON_TOOLS_ROOT=${HOME}/Qualcomm/HEXAGON_Tools/7.2.12/Tools)")
 
 if ("$ENV{HEXAGON_TOOLS_ROOT}" STREQUAL "")
 	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
@@ -51,50 +51,67 @@ macro (list2string out in)
 	endforeach()
 endmacro(list2string)
 
-set(V_ARCH "v5")
+# Define DSP version specific parameters
+if ("${DSP_TYPE}" STREQUAL "ADSPv5")
+	set(V_ARCH "v5")
+	if(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/6.4.")
+		set(HEXAGON_ARCH_FLAGS  -march=hexagonv5)
+	elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
+		set(HEXAGON_ARCH_FLAGS
+			-march=hexagon
+			-mcpu=hexagonv5
+			)
+	endif()
+elseif("${DSP_TYPE}" STREQUAL "SLPI")
+	set(V_ARCH "??")
+	if(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/6.4.")
+		set(HEXAGON_ARCH_FLAGS  -march=hexagonv?)
+	elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
+		set(HEXAGON_ARCH_FLAGS
+			-march=hexagon
+			-mcpu=hexagonv?
+			)
+else()
+	message(FATAL_ERROR "DSP_TYPE not defined")
+endif()
+
 set(CROSSDEV "hexagon-")
 
 # Detect compiler version
 if(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/6.4.")
 
-# Use the HexagonTools compiler (6.4.06) - This is deprecated
-set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/qc/bin)
-set(HEXAGON_GNU_BIN ${HEXAGON_TOOLS_ROOT}/gnu/bin)
-set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
-set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/dinkumware/lib/${V_ARCH}/G0/pic)
+	# Use the HexagonTools compiler (6.4.06) - This is deprecated
+	set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/qc/bin)
+	set(HEXAGON_GNU_BIN ${HEXAGON_TOOLS_ROOT}/gnu/bin)
+	set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
+	set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/dinkumware/lib/${V_ARCH}/G0/pic)
 
-set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
-set(CMAKE_CXX_COMPILER  ${HEXAGON_BIN}/${CROSSDEV}clang++)
+	set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
+	set(CMAKE_CXX_COMPILER  ${HEXAGON_BIN}/${CROSSDEV}clang++)
 
-set(CMAKE_AR	  ${HEXAGON_GNU_BIN}/${CROSSDEV}ar CACHE FILEPATH "Archiver")
-set(CMAKE_RANLIB  ${HEXAGON_GNU_BIN}/${CROSSDEV}ranlib)
-set(CMAKE_NM	  ${HEXAGON_GNU_BIN}/${CROSSDEV}nm)
-set(CMAKE_OBJDUMP ${HEXAGON_GNU_BIN}/${CROSSDEV}objdump)
-set(CMAKE_OBJCOPY ${HEXAGON_GNU_BIN}/${CROSSDEV}objcopy)
-set(HEXAGON_LINK  ${HEXAGON_GNU_BIN}/${CROSSDEV}ld)
-set(HEXAGON_ARCH_FLAGS  -march=hexagonv5)
+	set(CMAKE_AR	  ${HEXAGON_GNU_BIN}/${CROSSDEV}ar CACHE FILEPATH "Archiver")
+	set(CMAKE_RANLIB  ${HEXAGON_GNU_BIN}/${CROSSDEV}ranlib)
+	set(CMAKE_NM	  ${HEXAGON_GNU_BIN}/${CROSSDEV}nm)
+	set(CMAKE_OBJDUMP ${HEXAGON_GNU_BIN}/${CROSSDEV}objdump)
+	set(CMAKE_OBJCOPY ${HEXAGON_GNU_BIN}/${CROSSDEV}objcopy)
+	set(HEXAGON_LINK  ${HEXAGON_GNU_BIN}/${CROSSDEV}ld)
 
 elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
 
-# Use the HexagonTools compiler (7.2.12) from Hexagon 3.0 SDK
-set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/bin)
-set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
-set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
+	# Use the HexagonTools compiler (7.2.12) from Hexagon 3.0 SDK
+	set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/bin)
+	set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
+	set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
 
-set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
-set(CMAKE_CXX_COMPILER  ${HEXAGON_BIN}/${CROSSDEV}clang++)
+	set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
+	set(CMAKE_CXX_COMPILER  ${HEXAGON_BIN}/${CROSSDEV}clang++)
 
-set(CMAKE_AR	  ${HEXAGON_BIN}/${CROSSDEV}ar CACHE FILEPATH "Archiver")
-set(CMAKE_RANLIB  ${HEXAGON_BIN}/${CROSSDEV}ranlib)
-set(CMAKE_NM	  ${HEXAGON_BIN}/${CROSSDEV}nm)
-set(CMAKE_OBJDUMP ${HEXAGON_BIN}/${CROSSDEV}objdump)
-set(CMAKE_OBJCOPY ${HEXAGON_BIN}/${CROSSDEV}objcopy)
-set(HEXAGON_LINK  ${HEXAGON_BIN}/${CROSSDEV}link)
-set(HEXAGON_ARCH_FLAGS
-	-march=hexagon
-	-mcpu=hexagonv5
-	)
-
+	set(CMAKE_AR	  ${HEXAGON_BIN}/${CROSSDEV}ar CACHE FILEPATH "Archiver")
+	set(CMAKE_RANLIB  ${HEXAGON_BIN}/${CROSSDEV}ranlib)
+	set(CMAKE_NM	  ${HEXAGON_BIN}/${CROSSDEV}nm)
+	set(CMAKE_OBJDUMP ${HEXAGON_BIN}/${CROSSDEV}objdump)
+	set(CMAKE_OBJCOPY ${HEXAGON_BIN}/${CROSSDEV}objcopy)
+	set(HEXAGON_LINK  ${HEXAGON_BIN}/${CROSSDEV}link)
 else()
 	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
 endif()
@@ -218,7 +235,7 @@ set(CMAKE_CXX_FLAGS ${QURT_CMAKE_CXX_FLAGS} CACHE STRING "cxxflags")
 # dynamic libraries and invoked via FastRPC
 # These settings enable CMake to build the required test apps
 list2string(CMAKE_EXE_LINKER_FLAGS
-	-mv5
+	-m${V_ARCH}
 	-mG0lib
 	-G0
 	-fpic
@@ -246,6 +263,7 @@ set(CMAKE_CXX_COMPILER_ID, "Clang")
 
 # search for programs in the build host directories
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+
 # for libraries and headers in the target directories
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
@@ -254,7 +272,8 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 # in the base cmake scripts. We have to redefine the __linux_compiler_gnu
 # macro for cmake 2.8 to work
 set(__LINUX_COMPILER_GNU 1)
+
 macro(__linux_compiler_gnu lang)
-  set(CMAKE_SHARED_LIBRARY_LINK_${lang}_FLAGS "")
+	set(CMAKE_SHARED_LIBRARY_LINK_${lang}_FLAGS "")
 endmacro()
 
