@@ -82,9 +82,9 @@ set(HEXAGON_SDK_INCLUDES
 	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem${SDKRPCMEMINC}
 	)
 
-if(${QC_SOC_TARGET} STREQUAL "APQ8074")
+if (${QC_SOC_TARGET} STREQUAL "APQ8074")
 	set(DSP_TYPE "ADSP")
-	set(V_ARCH "v5"
+	set(V_ARCH "v5")
 	set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES} 
 		${HEXAGON_SDK_ROOT}/${SDKLIB}/common/qurt/ADSPv5MP/include
 		)
@@ -102,6 +102,6 @@ else()
 endif()
 
 # Validate DSP_TYPE
-if(NOT ("${DSP_TYPE}" STREQUAL "ADSP" OR "${DSP_TYPE}" STREQUAL "SLPI"))
+if (NOT ("${DSP_TYPE}" STREQUAL "ADSP" OR "${DSP_TYPE}" STREQUAL "SLPI"))
 	message(FATAL_ERROR "DSP_TYPE set to invalid value")
 endif()
