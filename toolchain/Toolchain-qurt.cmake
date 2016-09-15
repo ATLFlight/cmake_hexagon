@@ -33,6 +33,8 @@ include(CMakeForceCompiler)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+include(hexagon_sdk)
+
 set(TOOLS_ERROR_MSG
 		"The HexagonTools version 7.2.12 must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
 		"(e.g. export HEXAGON_TOOLS_ROOT=${HOME}/Qualcomm/HEXAGON_Tools/7.2.12/Tools)")
@@ -51,28 +53,11 @@ macro (list2string out in)
 	endforeach()
 endmacro(list2string)
 
-# Define DSP version specific parameters
-if ("${DSP_TYPE}" STREQUAL "ADSPv5")
-	set(V_ARCH "v5")
-	if(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/6.4.")
-		set(HEXAGON_ARCH_FLAGS  -march=hexagonv5)
-	elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
-		set(HEXAGON_ARCH_FLAGS
-			-march=hexagon
-			-mcpu=hexagonv5
-			)
-	endif()
-elseif("${DSP_TYPE}" STREQUAL "SLPI")
-	set(V_ARCH "??")
-	if(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/6.4.")
-		set(HEXAGON_ARCH_FLAGS  -march=hexagonv?)
-	elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
-		set(HEXAGON_ARCH_FLAGS
-			-march=hexagon
-			-mcpu=hexagonv?
-			)
-else()
-	message(FATAL_ERROR "DSP_TYPE not defined")
+# Validate DSP version specific parameters
+if ("${V_ARCH}" STREQUAL "")
+	message(FATAL_ERROR "V_ARCH not defined")
+elseif(NOT "${V_ARCH}" STREQUAL "v5")
+	message(FATAL_ERROR "Unsupported version of V_ARCH")
 endif()
 
 set(CROSSDEV "hexagon-")
@@ -95,6 +80,7 @@ if(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/6.4.")
 	set(CMAKE_OBJDUMP ${HEXAGON_GNU_BIN}/${CROSSDEV}objdump)
 	set(CMAKE_OBJCOPY ${HEXAGON_GNU_BIN}/${CROSSDEV}objcopy)
 	set(HEXAGON_LINK  ${HEXAGON_GNU_BIN}/${CROSSDEV}ld)
+	set(HEXAGON_ARCH_FLAGS  -march=hexagon${V_ARCH})
 
 elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
 
@@ -112,6 +98,10 @@ elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
 	set(CMAKE_OBJDUMP ${HEXAGON_BIN}/${CROSSDEV}objdump)
 	set(CMAKE_OBJCOPY ${HEXAGON_BIN}/${CROSSDEV}objcopy)
 	set(HEXAGON_LINK  ${HEXAGON_BIN}/${CROSSDEV}link)
+	set(HEXAGON_ARCH_FLAGS
+		-march=hexagon
+		-mcpu=hexagon${V_ARCH}
+		)
 else()
 	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
 endif()

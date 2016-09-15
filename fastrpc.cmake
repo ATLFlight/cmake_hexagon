@@ -12,7 +12,7 @@
 #    notice, this list of conditions and the following disclaimer in
 #    the documentation and/or other materials provided with the
 #    distribution.
-# 3. Neither the name PX4 nor the names of its contributors may be
+# 3. Neither the name ATLFLight nor the names of its contributors may be
 #    used to endorse or promote products derived from this software
 #    without specific prior written permission.
 #
@@ -65,7 +65,14 @@ set(FASTRPC_ARM_LINUX_INCLUDES
 	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE}
 	)
 
-set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
+if ("${DSP_TYPE}" STREQUAL "ADSP")
+	set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
+elseif("${DSP_TYPE}" STREQUAL "SLPI")
+	set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -lsdsprpc)
+else()
+	message(FATAL_ERROR "DSP_TYPE not defined")
+endif()
+
 set(ADSPMSGD ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
 set(RPCMEM ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem/UbuntuARM_${RELEASE}/rpcmem.a)
 
