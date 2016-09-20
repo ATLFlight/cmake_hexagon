@@ -94,6 +94,7 @@ set(DYNAMIC_LIBS -Wl,${TOOLSLIB}/libstdc++.a)
 set(ARCHCPUFLAGS
 	-m${V_ARCH}
 	-G0
+	-DDSP_TYPE_${DSP_TYPE}
 	)
 
 add_definitions(
