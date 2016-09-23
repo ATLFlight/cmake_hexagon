@@ -75,10 +75,11 @@ include(linux_app)
 #    testapp.so      - copy to target at /usr/share/date/adsp/
 #    testapp_skel.so - copy to target at /usr/share/date/adsp/
 #
+
 function(QURT_BUNDLE)
 	set(options)
 	set(oneValueArgs APP_NAME IDL_FILE APPS_COMPILER APP_DEST)
-	set(multiValueArgs APPS_SOURCES APPS_LINK_LIBS APPS_INCS DSP_SOURCES DSP_LINK_LIBS DSP_INCS)
+	set(multiValueArgs APPS_SOURCES APPS_LINK_LIBS APPS_INCS DSP_SOURCES DSP_LINK_LIBS DSP_INCS QAIC_INCS)
 	cmake_parse_arguments(QURT_BUNDLE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
 	if ("${QURT_BUNDLE_APP_NAME}" STREQUAL "")
@@ -88,8 +89,8 @@ function(QURT_BUNDLE)
 	if ("${QURT_BUNDLE_IDL_FILE}" STREQUAL "")
 		set(QURT_BUNDLE_IDL_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${QURT_BUNDLE_APP_NAME}.idl)
 	endif()
-
-	FASTRPC_STUB_GEN(${QURT_BUNDLE_IDL_FILE})
+	
+	FASTRPC_STUB_GEN(${QURT_BUNDLE_IDL_FILE} ${QURT_BUNDLE_QAIC_INCS})
 	get_filename_component(QURT_BUNDLE_IDL_NAME ${QURT_BUNDLE_IDL_FILE} NAME_WE)
 
 	message("APP_NAME = ${QURT_BUNDLE_APP_NAME}")
@@ -116,12 +117,18 @@ function(QURT_BUNDLE)
 		foreach(inc ${FASTRPC_ARM_LINUX_INCLUDES})
 			list(APPEND ${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS -I${inc})
 		endforeach()
+		
+    	# prepend -I in front of QAIC include dirs
+    	set(QAIC_INCLUDE_DIRS)	
+    	foreach(inc ${QURT_BUNDLE_QAIC_INCS})
+    		list(APPEND QAIC_INCLUDE_DIRS -I${CMAKE_CURRENT_SOURCE_DIR}/${inc})
+    	endforeach()		
 
 		set(${QURT_BUNDLE_APP_NAME}_LINK_DIRS ${FASTRPC_ARM_LIBS})
 
 		# Build the apps processor app and RPC stub using the provided ${QURT_BUNDLE_APPS_COMPILER}
 		add_custom_target(${QURT_BUNDLE_APP_NAME}_app ALL
-			COMMAND ${QURT_BUNDLE_APPS_COMPILER}  ${${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS} -o ${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME} ${QURT_BUNDLE_APPS_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_IDL_NAME}_stub.c" ${FASTRPC_ARM_LIBS} 
+			COMMAND ${QURT_BUNDLE_APPS_COMPILER}  ${${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS} ${QAIC_INCLUDE_DIRS} -o ${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME} ${QURT_BUNDLE_APPS_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_IDL_NAME}_stub.c" ${FASTRPC_ARM_LIBS} 
 			DEPENDS generate_${QURT_BUNDLE_IDL_NAME}_stubs
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			)
