@@ -33,7 +33,7 @@ include(CMakeForceCompiler)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-set(TOOLS_ERROR_MSG 
+set(TOOLS_ERROR_MSG
 		"The HexagonTools version 7.2.12 must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
 		"(e.g. export HEXAGON_TOOLS_ROOT=${HOME}/Qualcomm/HEXAGON_Tools/7.2.12/Tools)")
 
@@ -90,7 +90,7 @@ set(CMAKE_NM	  ${HEXAGON_BIN}/${CROSSDEV}nm)
 set(CMAKE_OBJDUMP ${HEXAGON_BIN}/${CROSSDEV}objdump)
 set(CMAKE_OBJCOPY ${HEXAGON_BIN}/${CROSSDEV}objcopy)
 set(HEXAGON_LINK  ${HEXAGON_BIN}/${CROSSDEV}link)
-set(HEXAGON_ARCH_FLAGS  
+set(HEXAGON_ARCH_FLAGS
 	-march=hexagon
 	-mcpu=hexagonv5
 	)
