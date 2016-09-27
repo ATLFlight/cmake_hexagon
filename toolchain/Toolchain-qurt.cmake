@@ -148,7 +148,7 @@ set(ARCHCPUFLAGS
 	)
 
 add_definitions(
-	-D __QURT
+	-D __DF_QURT
 	-D _PID_T
 	-D _UID_T
 	-D _TIMER_T
