@@ -89,7 +89,6 @@ function(QURT_BUNDLE)
 	if ("${QURT_BUNDLE_IDL_FILE}" STREQUAL "")
 		set(QURT_BUNDLE_IDL_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${QURT_BUNDLE_APP_NAME}.idl)
 	endif()
-	
 	FASTRPC_STUB_GEN(${QURT_BUNDLE_IDL_FILE} ${QURT_BUNDLE_QAIC_INCS})
 	get_filename_component(QURT_BUNDLE_IDL_NAME ${QURT_BUNDLE_IDL_FILE} NAME_WE)
 
@@ -120,9 +119,14 @@ function(QURT_BUNDLE)
 		
     	# prepend -I in front of QAIC include dirs
     	set(QAIC_INCLUDE_DIRS)	
-    	foreach(inc ${QURT_BUNDLE_QAIC_INCS})
-    		list(APPEND QAIC_INCLUDE_DIRS -I${CMAKE_CURRENT_SOURCE_DIR}/${inc})
-    	endforeach()		
+	foreach(inc ${QURT_BUNDLE_QAIC_INCS})
+		string(SUBSTRING ${inc} 0 1 absolute_path_character)
+		if (absolute_path_character STREQUAL "/")
+			list(APPEND QAIC_INCLUDE_DIRS -I${inc})
+		else()
+			list(APPEND QAIC_INCLUDE_DIRS -I${CMAKE_CURRENT_SOURCE_DIR}/${inc})
+		endif()
+	endforeach()		
 
 		set(${QURT_BUNDLE_APP_NAME}_LINK_DIRS ${FASTRPC_ARM_LIBS})
 
