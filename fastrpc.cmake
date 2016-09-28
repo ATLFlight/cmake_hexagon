@@ -64,7 +64,6 @@ set(FASTRPC_ARM_LINUX_INCLUDES
 	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE}
 	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE}
 	)
-
 set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
 set(ADSPMSGD ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
 set(RPCMEM ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem/UbuntuARM_${RELEASE}/rpcmem.a)
@@ -82,12 +81,26 @@ include_directories(
 function(FASTRPC_STUB_GEN IDLFILE)
 	get_filename_component(FASTRPC_IDL_NAME ${IDLFILE} NAME_WE)
 	get_filename_component(FASTRPC_IDL_PATH ${IDLFILE} ABSOLUTE)
-
+	set (IDLINCS ${ARGN})
+    
+	# prepend -I in front of QAIC include dirs
+	set(QAIC_INCLUDE_DIRS)
+	foreach(inc ${IDLINCS})
+		string(SUBSTRING ${inc} 0 1 absolute_path_character)
+		if (absolute_path_character STREQUAL "/")
+		    	list(APPEND QAIC_INCLUDE_DIRS -I${inc})
+			message("QAIC include directory: -I${inc}")
+		else()
+	    		list(APPEND QAIC_INCLUDE_DIRS -I${CMAKE_CURRENT_SOURCE_DIR}/${inc})
+			message("QAIC include directory: -I${CMAKE_CURRENT_SOURCE_DIR}/${inc}")
+		endif()
+	endforeach()		    
+	
 	# Run the IDL compiler to generate the stubs
 	add_custom_command(
 		OUTPUT ${FASTRPC_IDL_NAME}.h ${FASTRPC_IDL_NAME}_skel.c ${FASTRPC_IDL_NAME}_stub.c
 		DEPENDS ${FASTRPC_IDL_PATH}
-		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef" "${FASTRPC_IDL_PATH}"
+		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef" ${QAIC_INCLUDE_DIRS} ${FASTRPC_IDL_PATH}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		)
 
