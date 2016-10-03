@@ -104,13 +104,13 @@ function(QURT_BUNDLE)
 		endif()
 
 		set(${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS
-       		-I${CMAKE_CURRENT_BINARY_DIR}
+			-I${CMAKE_CURRENT_BINARY_DIR}
 			)
-			
+
 		# prepend -I in front of APPS include dirs
 		foreach(inc ${QURT_BUNDLE_APPS_INCS})
 			list(APPEND ${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS -I${inc})
-		endforeach()			
+		endforeach()
 
 		# prepend -I in front of FastRPC include dirs
 		foreach(inc ${FASTRPC_ARM_LINUX_INCLUDES})
