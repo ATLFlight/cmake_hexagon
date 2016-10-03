@@ -12,7 +12,7 @@
 #    notice, this list of conditions and the following disclaimer in
 #    the documentation and/or other materials provided with the
 #    distribution.
-# 3. Neither the name ATLFLight nor the names of its contributors may be
+# 3. Neither the name PX4 nor the names of its contributors may be
 #    used to endorse or promote products derived from this software
 #    without specific prior written permission.
 #
@@ -90,7 +90,7 @@ function(FASTRPC_STUB_GEN IDLFILE)
 	get_filename_component(FASTRPC_IDL_NAME ${IDLFILE} NAME_WE)
 	get_filename_component(FASTRPC_IDL_PATH ${IDLFILE} ABSOLUTE)
 	set (IDLINCS ${ARGN})
-
+    
 	# prepend -I in front of QAIC include dirs
 	set(QAIC_INCLUDE_DIRS)
 	foreach(inc ${IDLINCS})
