@@ -40,8 +40,13 @@
 #	HEXAGON_TOOLS_ROOT
 #	HEXAGON_SDK_ROOT
 #
+# CMake Variables:
+#	QC_SOC_TARGET
+#
+# OPTIONAL:
+#	DSP_TYPE (ADSP or SLPI)
 
-set(TOOLS_ERROR_MSG 
+set(TOOLS_ERROR_MSG
 		"The HexagonTools version 7.2.X must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
 		"(e.g. export HEXAGON_TOOLS_ROOT=$ENV{HOME}/Qualcomm/HEXAGON_Tools/7.2.12/Tools)")
 
@@ -77,7 +82,26 @@ set(HEXAGON_SDK_INCLUDES
 	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem${SDKRPCMEMINC}
 	)
 
-set(HEXAGON_8074_INCLUDES
-	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/qurt/ADSPv5MP/include
-	)
+if ("${QC_SOC_TARGET}" STREQUAL "APQ8074")
+	set(DSP_TYPE "ADSP")
+	set(V_ARCH "v5")
+	set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
+		${HEXAGON_SDK_ROOT}/${SDKLIB}/common/qurt/ADSPv5MP/include
+		)
+elseif ("${QC_SOC_TARGET}" STREQUAL "APQ8096")
+	# Set the default to SLPI
+	if ("${DSP_TYPE}" STREQUAL "")
+		set(DSP_TYPE "SLPI")
+	endif()
+	set(V_ARCH "v5")
+	set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
+		${HEXAGON_SDK_ROOT}/${SDKLIB}/common/qurt/ADSPv5MP/include
+		)
+else()
+	message(FATAL_ERROR "QC_SOC_TARGET not set")
+endif()
 
+# Validate DSP_TYPE
+if (NOT ("${DSP_TYPE}" STREQUAL "ADSP" OR "${DSP_TYPE}" STREQUAL "SLPI"))
+	message(FATAL_ERROR "DSP_TYPE set to invalid value")
+endif()

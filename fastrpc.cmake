@@ -64,11 +64,19 @@ set(FASTRPC_ARM_LINUX_INCLUDES
 	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE}
 	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE}
 	)
-set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
+
+if ("${DSP_TYPE}" STREQUAL "ADSP")
+	set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
+elseif("${DSP_TYPE}" STREQUAL "SLPI")
+	set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -lsdsprpc)
+else()
+	message(FATAL_ERROR "DSP_TYPE not defined")
+endif()
+
 set(ADSPMSGD ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
 set(RPCMEM ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem/UbuntuARM_${RELEASE}/rpcmem.a)
 
-set(FASTRPC_ARM_LIBS 
+set(FASTRPC_ARM_LIBS
 	${ADSPRPC}
 	${RPCMEM}
 	)
@@ -88,13 +96,13 @@ function(FASTRPC_STUB_GEN IDLFILE)
 	foreach(inc ${IDLINCS})
 		string(SUBSTRING ${inc} 0 1 absolute_path_character)
 		if (absolute_path_character STREQUAL "/")
-		    	list(APPEND QAIC_INCLUDE_DIRS -I${inc})
+			list(APPEND QAIC_INCLUDE_DIRS -I${inc})
 			message("QAIC include directory: -I${inc}")
 		else()
-	    		list(APPEND QAIC_INCLUDE_DIRS -I${CMAKE_CURRENT_SOURCE_DIR}/${inc})
+			list(APPEND QAIC_INCLUDE_DIRS -I${CMAKE_CURRENT_SOURCE_DIR}/${inc})
 			message("QAIC include directory: -I${CMAKE_CURRENT_SOURCE_DIR}/${inc}")
 		endif()
-	endforeach()		    
+	endforeach()
 	
 	# Run the IDL compiler to generate the stubs
 	add_custom_command(
