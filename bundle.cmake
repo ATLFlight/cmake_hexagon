@@ -59,7 +59,7 @@ include(qurt_lib)
 include(linux_app)
 
 #
-# Hexagon apps are started from an app running on the apps processor 
+# Hexagon apps are started from an app running on the apps processor
 # of the SoC. An RPC mechanism is used to load the app on the DSP and
 # the RPC stubs are generated from a IDL complier (qaic). The RTOS on
 # the DSP is QuRT but is often abstraced by the DSPAL APIs.
@@ -104,21 +104,21 @@ function(QURT_BUNDLE)
 		endif()
 
 		set(${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS
-       		-I${CMAKE_CURRENT_BINARY_DIR}
+			-I${CMAKE_CURRENT_BINARY_DIR}
 			)
-			
+
 		# prepend -I in front of APPS include dirs
 		foreach(inc ${QURT_BUNDLE_APPS_INCS})
 			list(APPEND ${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS -I${inc})
-		endforeach()			
+		endforeach()
 
 		# prepend -I in front of FastRPC include dirs
 		foreach(inc ${FASTRPC_ARM_LINUX_INCLUDES})
 			list(APPEND ${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS -I${inc})
 		endforeach()
-		
-    	# prepend -I in front of QAIC include dirs
-    	set(QAIC_INCLUDE_DIRS)	
+
+	# prepend -I in front of QAIC include dirs
+	set(QAIC_INCLUDE_DIRS)
 	foreach(inc ${QURT_BUNDLE_QAIC_INCS})
 		string(SUBSTRING ${inc} 0 1 absolute_path_character)
 		if (absolute_path_character STREQUAL "/")
@@ -126,13 +126,13 @@ function(QURT_BUNDLE)
 		else()
 			list(APPEND QAIC_INCLUDE_DIRS -I${CMAKE_CURRENT_SOURCE_DIR}/${inc})
 		endif()
-	endforeach()		
+	endforeach()
 
 		set(${QURT_BUNDLE_APP_NAME}_LINK_DIRS ${FASTRPC_ARM_LIBS})
 
 		# Build the apps processor app and RPC stub using the provided ${QURT_BUNDLE_APPS_COMPILER}
 		add_custom_target(${QURT_BUNDLE_APP_NAME}_app ALL
-			COMMAND ${QURT_BUNDLE_APPS_COMPILER}  ${${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS} ${QAIC_INCLUDE_DIRS} -o ${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME} ${QURT_BUNDLE_APPS_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_IDL_NAME}_stub.c" ${FASTRPC_ARM_LIBS} 
+			COMMAND ${QURT_BUNDLE_APPS_COMPILER}  ${${QURT_BUNDLE_APP_NAME}_INCLUDE_DIRS} ${QAIC_INCLUDE_DIRS} -o ${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_APP_NAME} ${QURT_BUNDLE_APPS_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/${QURT_BUNDLE_IDL_NAME}_stub.c" ${FASTRPC_ARM_LIBS}
 			DEPENDS generate_${QURT_BUNDLE_IDL_NAME}_stubs
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			)
@@ -141,7 +141,7 @@ function(QURT_BUNDLE)
 			LOADNAME ${QURT_BUNDLE_APP_NAME}_app
 			TARGET ${QURT_BUNDLE_APP_NAME}
 			DEPNAME ${QURT_BUNDLE_APP_NAME}_app
-			DEST ${QURT_BUNDLE_APP_DEST}	
+			DEST ${QURT_BUNDLE_APP_DEST}
 			)
 	endif()
 
