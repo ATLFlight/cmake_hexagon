@@ -141,10 +141,6 @@ function (LINUX_APP)
 		message(FATAL_ERROR "LINUX_APP called without SOURCES")
 	endif()
 
-	if ("${LINUX_APP_IDL_NAME}" STREQUAL "")
-		message(FATAL_ERROR "LINUX_APP called without IDL_NAME")
-	endif()
-
 	include_directories(
 		${CMAKE_CURRENT_BINARY_DIR}
 		${FASTRPC_ARM_LINUX_INCLUDES}
@@ -152,11 +148,17 @@ function (LINUX_APP)
 
 	#message("LINUX_APP_INCS = ${LINUX_APP_INCS}")
 
-	# Build lib that is run on the DSP
-	add_executable(${LINUX_APP_APP_NAME}
-		${LINUX_APP_SOURCES}
-		${LINUX_APP_IDL_NAME}_stub.c
-		)
+	# Build lib that is run on the AppsProc
+    if ("${LINUX_APP_IDL_NAME}" STREQUAL "")
+ 	    add_executable(${LINUX_APP_APP_NAME}
+		    ${LINUX_APP_SOURCES}
+		    )   
+    elseif()
+	    add_executable(${LINUX_APP_APP_NAME}
+		    ${LINUX_APP_SOURCES}
+		    ${LINUX_APP_IDL_NAME}_stub.c
+		    )
+    endif()		
 
 	if (NOT "${LINUX_APP_INCS}" STREQUAL "")
 		target_include_directories(${LINUX_APP_APP_NAME} PUBLIC ${LINUX_APP_INCS})
@@ -169,7 +171,9 @@ function (LINUX_APP)
 		${FASTRPC_ARM_LIBS}
 		)
 
-	add_dependencies(${LINUX_APP_APP_NAME} generate_${LINUX_APP_IDL_NAME}_stubs)
+    if (NOT ("${LINUX_APP_IDL_NAME}" STREQUAL ""))
+	    add_dependencies(${LINUX_APP_APP_NAME} generate_${LINUX_APP_IDL_NAME}_stubs)
+    endif()	    
 
 	FASTRPC_ARM_LINUX_LOAD(
 		LOADNAME ${LINUX_APP_APP_NAME}
