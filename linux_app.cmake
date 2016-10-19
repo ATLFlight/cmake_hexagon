@@ -93,6 +93,8 @@ function (LINUX_LIB)
 		${FASTRPC_ARM_LINUX_INCLUDES}
 		)
 
+	add_definitions( "-DDSP_TYPE_${DSP_TYPE}" )
+
 	#message("LINUX_LIB_INCS = ${LINUX_LIB_INCS}")
 
 	if (NOT "${LINUX_LIB_SOURCES}" STREQUAL "")
@@ -149,6 +151,8 @@ function (LINUX_APP)
 		${CMAKE_CURRENT_BINARY_DIR}
 		${FASTRPC_ARM_LINUX_INCLUDES}
 		)
+
+	add_definitions( "-DDSP_TYPE_${DSP_TYPE}" )
 
 	#message("LINUX_APP_INCS = ${LINUX_APP_INCS}")
 
