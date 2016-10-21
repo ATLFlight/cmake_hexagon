@@ -57,6 +57,7 @@
 include(fastrpc)
 
 include (CMakeParseArguments)
+include (qurt_flags)
 
 # Process DSP files
 function (QURT_LIB)
