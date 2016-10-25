@@ -74,11 +74,9 @@ else()
 endif()
 
 set(ADSPMSGD ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
-set(RPCMEM ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem/UbuntuARM_${RELEASE}/rpcmem.a)
 
 set(FASTRPC_ARM_LIBS
 	${ADSPRPC}
-	${RPCMEM}
 	)
 
 	
