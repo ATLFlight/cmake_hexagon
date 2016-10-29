@@ -55,7 +55,7 @@ set(V_ARCH "v5")
 set(CROSSDEV "hexagon-")
 
 # Detect compiler version
-if(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/6.4.")
+if(${HEXAGON_TOOLS_ROOT} MATCHES "/6.4.")
 
 	# Use the HexagonTools compiler (6.4.06) - This is deprecated
 	set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/qc/bin)
@@ -74,7 +74,7 @@ set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/dinkumware/lib/${V_ARCH}/G0/pic)
 	set(HEXAGON_LINK  ${HEXAGON_GNU_BIN}/${CROSSDEV}ld)
 set(HEXAGON_ARCH_FLAGS  -march=hexagonv5)
 
-elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
+elseif(${HEXAGON_TOOLS_ROOT} MATCHES "/7.2.")
 
 	# Use the HexagonTools compiler (7.2.12) from Hexagon 3.0 SDK
 	set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/bin)
