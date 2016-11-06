@@ -98,23 +98,20 @@ function (QURT_LIB)
 			)
 
 		add_dependencies(${QURT_LIB_LIB_NAME} generate_${QURT_LIB_IDL_NAME}_stubs)
-
 	endif()
 
 	add_library(${QURT_LIB_IDL_NAME}_skel MODULE
 		${QURT_LIB_IDL_NAME}_skel.c
 		)
 
-	if (NOT "${QURT_LIB_SOURCES}" STREQUAL "")
-		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
-			${QURT_LIB_LIB_NAME}
-			)
-	else()
-		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
-			${QURT_LIB_LINK_LIBS}
-			)
-	endif()
-	add_dependencies(${QURT_LIB_IDL_NAME}_skel generate_${QURT_LIB_IDL_NAME}_stubs)
+	target_link_libraries(${QURT_LIB_IDL_NAME}_skel
+		"lib${QURT_LIB_LIB_NAME}.so"
+		)
+
+	add_dependencies(${QURT_LIB_IDL_NAME}_skel
+		generate_${QURT_LIB_IDL_NAME}_stubs
+		${QURT_LIB_LIB_NAME}
+		)
 
 	#message("Making custom target build_${QURT_LIB_LIB_NAME}_dsp")
 	#add_custom_target(build_${QURT_LIB_LIB_NAME}_dsp ALL
