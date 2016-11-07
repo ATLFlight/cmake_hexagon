@@ -61,9 +61,7 @@ if ("$ENV{HEXAGON_SDK_ROOT}" STREQUAL "")
 endif()
 
 if ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/2.0")
-	set(SDKINC inc)
-	set(SDKLIB lib)
-	set(SDKRPCMEMINC)
+	message(FATAL_ERROR "HEXAGON_SDK 2.0 no longer supported")
 elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.0")
 	set(SDKINC incs)
 	set(SDKLIB libs)
@@ -72,7 +70,6 @@ elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.0")
 else()
         message(FATAL_ERROR "Unsupported/Unknown HEXAGON SDK version")
 endif()
-
 
 set(HEXAGON_SDK_ROOT $ENV{HEXAGON_SDK_ROOT})
 
