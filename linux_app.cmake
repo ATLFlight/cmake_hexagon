@@ -103,7 +103,7 @@ function (LINUX_LIB)
 		add_library(${LINUX_LIB_LIB_NAME} SHARED
 			${LINUX_LIB_SOURCES}
 			${LINUX_LIB_IDL_NAME}_stub.c
-			${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem/rpcmem.c
+			${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem/src/rpcmem.c
 			)
 
 		if (NOT "${LINUX_LIB_FLAGS}" STREQUAL "")
@@ -161,7 +161,7 @@ function (LINUX_APP)
 	add_executable(${LINUX_APP_APP_NAME}
 		${LINUX_APP_SOURCES}
 		${LINUX_APP_IDL_NAME}_stub.c
-		${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem/rpcmem.c
+		${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem/src/rpcmem.c
 		)
 
 	if (NOT "${LINUX_APP_INCS}" STREQUAL "")

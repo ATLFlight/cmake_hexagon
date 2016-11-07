@@ -76,8 +76,13 @@ function (QURT_LIB)
 
 	message("QURT_LIB_INCS = ${QURT_LIB_INCS}")
 
-	if (NOT "${QURT_LIB_SOURCES}" STREQUAL "")
+	add_library(${QURT_LIB_IDL_NAME}_skel MODULE
+		${QURT_LIB_IDL_NAME}_skel.c
+		)
 
+	if ("${QURT_LIB_SOURCES}" STREQUAL "")
+		message(FATAL_ERROR "QURT_LIB called without SOURCES")
+	else()
 		# Build lib that is run on the DSP
 		add_library(${QURT_LIB_LIB_NAME} SHARED
 			${QURT_LIB_SOURCES}
@@ -99,22 +104,13 @@ function (QURT_LIB)
 
 		add_dependencies(${QURT_LIB_LIB_NAME} generate_${QURT_LIB_IDL_NAME}_stubs)
 
-	endif()
-
-	add_library(${QURT_LIB_IDL_NAME}_skel MODULE
-		${QURT_LIB_IDL_NAME}_skel.c
-		)
-
-	if (NOT "${QURT_LIB_SOURCES}" STREQUAL "")
+		# Link the app-lib to the skel-lib as it implements the skel functions
 		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
 			${QURT_LIB_LIB_NAME}
 			)
-	else()
-		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
-			${QURT_LIB_LINK_LIBS}
-			)
+
+		add_dependencies(${QURT_LIB_IDL_NAME}_skel generate_${QURT_LIB_IDL_NAME}_stubs)
 	endif()
-	add_dependencies(${QURT_LIB_IDL_NAME}_skel generate_${QURT_LIB_IDL_NAME}_stubs)
 
 	#message("Making custom target build_${QURT_LIB_LIB_NAME}_dsp")
 	#add_custom_target(build_${QURT_LIB_LIB_NAME}_dsp ALL
