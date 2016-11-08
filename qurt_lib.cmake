@@ -104,12 +104,16 @@ function (QURT_LIB)
 
 		add_dependencies(${QURT_LIB_LIB_NAME} generate_${QURT_LIB_IDL_NAME}_stubs)
 
-		# Link the app-lib to the skel-lib as it implements the skel functions
+		# Hack to support PX4 - because it links static libs into .so targets it ends up with
+		# Duplicate symbols. This can be reverted to link ${QURT_LIB_LIB_NAME} when PX4 is fixed.
 		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
-			${QURT_LIB_LIB_NAME}
+			"lib${QURT_LIB_LIB_NAME}.so"
 			)
 
-		add_dependencies(${QURT_LIB_IDL_NAME}_skel generate_${QURT_LIB_IDL_NAME}_stubs)
+		add_dependencies(${QURT_LIB_IDL_NAME}_skel
+			generate_${QURT_LIB_IDL_NAME}_stubs
+			${QURT_LIB_LIB_NAME}
+			)
 	endif()
 
 	#message("Making custom target build_${QURT_LIB_LIB_NAME}_dsp")
