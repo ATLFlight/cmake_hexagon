@@ -107,7 +107,7 @@ function (QURT_LIB)
 		# Hack to support PX4 - because it links static libs into .so targets it ends up with
 		# Duplicate symbols. This can be reverted to link ${QURT_LIB_LIB_NAME} when PX4 is fixed.
 		target_link_libraries(${QURT_LIB_IDL_NAME}_skel
-			"lib${QURT_LIB_LIB_NAME}.so"
+			"${CMAKE_CURRENT_BINARY_DIR}/lib${QURT_LIB_LIB_NAME}.so"
 			)
 
 		add_dependencies(${QURT_LIB_IDL_NAME}_skel
