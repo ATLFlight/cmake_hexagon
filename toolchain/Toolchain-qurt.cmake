@@ -99,6 +99,10 @@ else()
 	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
 endif()
 
+# Must set the arch flags so the compiler tests are successful
+set(CMAKE_C_FLAGS "-march=hexagon -mcpu=hexagonv5")
+set(CMAKE_CXX_FLAGS "-march=hexagon -mcpu=hexagonv5")
+
 set(CMAKE_SKIP_RPATH TRUE CACHE BOOL SKIP_RPATH FORCE)
 
 # where is the target environment
