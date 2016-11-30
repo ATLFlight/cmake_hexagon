@@ -123,3 +123,27 @@ macro(__linux_compiler_gnu lang)
 	set(CMAKE_SHARED_LIBRARY_LINK_${lang}_FLAGS "")
 endmacro()
 
+set(SDK_ERROR_MSG
+	"The Hexagon_SDK version 3 must be installed and the environment variable HEXAGON_SDK_ROOT must be set"
+	"(e.g. export HEXAGON_SDK_ROOT=${HOME}/Qualcomm/Hexagon_SDK/3.0)")
+
+if ("$ENV{HEXAGON_SDK_ROOT}" STREQUAL "")
+	message(FATAL_ERROR ${SDK_ERROR_MSG})
+else()
+	set(HEXAGON_SDK_ROOT $ENV{HEXAGON_SDK_ROOT})
+endif()
+
+# Find the ARM cross compiler for making a bundle
+foreach(tool arm-linux-gnueabihf-gcc arm-linux-gnueabihf-g++)
+        string(TOUPPER ${tool} TOOL)
+	find_program(${TOOL} ${tool}
+		PATHS
+			${HEXAGON_SDK_ROOT}/gcc-linaro-arm-linux-gnueabihf-4.8-2013.08_linux/bin
+			${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin
+			${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin
+		NO_DEFAULT_PATH
+		)
+	if(NOT ${TOOL})
+		message(FATAL_ERROR "could not find ${TOOL}")
+	endif()
+endforeach()
