@@ -92,8 +92,8 @@ function(QURT_BUNDLE)
 	FASTRPC_STUB_GEN(${QURT_BUNDLE_IDL_FILE} ${QURT_BUNDLE_QAIC_INCS})
 	get_filename_component(QURT_BUNDLE_IDL_NAME ${QURT_BUNDLE_IDL_FILE} NAME_WE)
 
-	message("APP_NAME = ${QURT_BUNDLE_APP_NAME}")
-	message("IDL_FILE = ${QURT_BUNDLE_IDL_FILE}")
+	#message("APP_NAME = ${QURT_BUNDLE_APP_NAME}")
+	#message("IDL_FILE = ${QURT_BUNDLE_IDL_FILE}")
 
 	# Process Apps processor files
 	if (NOT "${QURT_BUNDLE_APPS_SOURCES}" STREQUAL "")
