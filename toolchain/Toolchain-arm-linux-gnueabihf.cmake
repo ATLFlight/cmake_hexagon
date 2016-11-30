@@ -80,8 +80,8 @@ cmake_force_c_compiler(${C_COMPILER} GNU)
 
 find_program(CXX_COMPILER arm-linux-gnueabihf-g++
 	PATHS
-		${HEXAGON_SDK_ROOT}/gcc-linaro-arm-linux-gnueabihf-4.8-2013.08_linux/bin 
-        	${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin
+		${HEXAGON_SDK_ROOT}/gcc-linaro-arm-linux-gnueabihf-4.8-2013.08_linux/bin
+		${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin
 		${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin
 	NO_DEFAULT_PATH
 	)
