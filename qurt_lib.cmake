@@ -121,22 +121,30 @@ function (QURT_LIB)
 	#	DEPENDS ${QURT_LIB_IDL_NAME} ${QURT_LIB_IDL_NAME}_skel
 	#	)
 
+   if ("${QC_SOC_TARGET}" STREQUAL "APQ8096")
+      # Set the location for 8x96 target
+      set(DSPLIB_TARGET_PATH "/usr/lib/rfsa/adsp/")
+   else()
+      # 8x74 target is assumed by default.
+      set(DSPLIB_TARGET_PATH "/usr/share/data/adsp/")
+   endif()
+   
 	if ("${QURT_LIB_LIB_NAME}" STREQUAL "")
 		# Add a rule to load the files onto the target that run in the DSP
 		add_custom_target(lib${QURT_LIB_IDL_NAME}_skel-load
 			DEPENDS ${QURT_LIB_IDL_NAME}_skel
 			COMMAND adb wait-for-device
-			COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/
-			COMMAND echo "Pushed lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/"
+			COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so ${DSPLIB_TARGET_PATH}
+			COMMAND echo "Pushed lib${QURT_LIB_IDL_NAME}_skel.so ${DSPLIB_TARGET_PATH}"
 			)
 	else()
 		# Add a rule to load the files onto the target that run in the DSP
 		add_custom_target(lib${QURT_LIB_LIB_NAME}-load
 			DEPENDS ${QURT_LIB_LIB_NAME} ${QURT_LIB_IDL_NAME}_skel
 			COMMAND adb wait-for-device
-			COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so /usr/share/data/adsp/
-			COMMAND adb push lib${QURT_LIB_LIB_NAME}.so /usr/share/data/adsp/
-			COMMAND echo "Pushed lib${QURT_LIB_LIB_NAME}.so and dependencies to /usr/share/data/adsp/"
+			COMMAND adb push lib${QURT_LIB_IDL_NAME}_skel.so ${DSPLIB_TARGET_PATH}
+			COMMAND adb push lib${QURT_LIB_LIB_NAME}.so ${DSPLIB_TARGET_PATH}
+			COMMAND echo "Pushed lib${QURT_LIB_LIB_NAME}.so and dependencies to ${DSPLIB_TARGET_PATH}"
 			)
 	endif()
 endfunction()
