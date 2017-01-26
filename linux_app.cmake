@@ -62,10 +62,18 @@ function(FASTRPC_ARM_LINUX_LOAD)
 	set(oneValueArgs LOADNAME TARGET DEPNAME DEST)
 	cmake_parse_arguments(FASTRPC_ARM_LINUX_LOAD "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
+   if ("${QC_SOC_TARGET}" STREQUAL "APQ8096")
+      # Set the location for 8x96 target
+      set(APPS_TARGET_PATH "/home/root")
+   else()
+      # 8x74 target is assumed by default.
+      set(APPS_TARGET_PATH "/home/linaro")
+   endif()
+
 	# Build lib that is run on the DSP invoked by RPC framework
 	# Set default install path of apps processor executable
 	if ("${FASTRPC_ARM_LINUX_LOAD_DEST}" STREQUAL "")
-		set(FASTRPC_ARM_LINUX_LOAD_DEST "/home/linaro")
+		set(FASTRPC_ARM_LINUX_LOAD_DEST "${APPS_TARGET_PATH}")
 	endif()
 
 	# Add a rule to load the file onto the target
