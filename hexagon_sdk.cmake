@@ -81,9 +81,9 @@ set(HEXAGON_SDK_INCLUDES
 
 if ("${QC_SOC_TARGET}" STREQUAL "APQ8074")
 	set(DSP_TYPE "ADSP")
-	set(V_ARCH "v56")
+	set(V_ARCH "v55")
 	set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
-		${HEXAGON_SDK_ROOT}/${SDKLIB}/common/qurt/ADSPv56MP/include
+		${HEXAGON_SDK_ROOT}/${SDKLIB}/common/qurt/ADSPv55MP/include
 		)
 elseif ("${QC_SOC_TARGET}" STREQUAL "APQ8096")
 	# Set the default to SLPI
