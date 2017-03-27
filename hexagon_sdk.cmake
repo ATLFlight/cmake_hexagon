@@ -47,7 +47,7 @@
 #	DSP_TYPE (ADSP or SLPI)
 
 set(TOOLS_ERROR_MSG
-		"The HexagonTools version 7.2.X must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
+		"HEXAGON_Tools must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
 		"(e.g. export HEXAGON_TOOLS_ROOT=$ENV{HOME}/Qualcomm/HEXAGON_Tools/7.2.12/Tools)")
 
 if ("$ENV{HEXAGON_TOOLS_ROOT}" STREQUAL "")
@@ -63,6 +63,11 @@ endif()
 if ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/2.0")
 	message(FATAL_ERROR "HEXAGON_SDK 2.0 no longer supported")
 elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.0")
+	set(SDKINC incs)
+	set(SDKLIB libs)
+	set(SDKLIB libs)
+	set(SDKRPCMEMINC /inc)
+elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.1")
 	set(SDKINC incs)
 	set(SDKLIB libs)
 	set(SDKLIB libs)
