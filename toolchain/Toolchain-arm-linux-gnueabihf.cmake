@@ -73,7 +73,7 @@ set(CMAKE_SYSTEM_VERSION 1)
 # specify the cross compiler
 find_program(C_COMPILER arm-linux-gnueabihf-gcc
 	PATHS
-		${ARM_TOOLS_ROOT}/${ARM_GCC_VERSION}/bin
+		${ARM_CROSS_GCC_ROOT}/bin
 	NO_DEFAULT_PATH
 	)
 
@@ -84,7 +84,7 @@ cmake_force_c_compiler(${C_COMPILER} GNU)
 
 find_program(CXX_COMPILER arm-linux-gnueabihf-g++
 	PATHS
-		${ARM_TOOLS_ROOT}/${ARM_GCC_VERSION}/bin
+		${ARM_CROSS_GCC_ROOT}/bin
 	NO_DEFAULT_PATH
 	)
 
@@ -98,7 +98,7 @@ foreach(tool objcopy nm ld)
 	string(TOUPPER ${tool} TOOL)
 	find_program(${TOOL} arm-linux-gnueabihf-${tool}
 		PATHS
-			${ARM_TOOLS_ROOT}/${ARM_GCC_VERSION}/bin
+			${ARM_CROSS_GCC_ROOT}/bin
 		NO_DEFAULT_PATH
 		)
 	if(NOT ${TOOL})
