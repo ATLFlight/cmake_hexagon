@@ -133,14 +133,42 @@ else()
 	set(HEXAGON_SDK_ROOT $ENV{HEXAGON_SDK_ROOT})
 endif()
 
+set(ARM_GCC_ERROR_MSG
+	"The environment variable ARM_CROSS_GCC_ROOT must be set to the directory containing the ARMv7hf cross compiler")
+
+if ("$ENV{ARM_CROSS_GCC_ROOT}" STREQUAL "")
+	message(FATAL_ERROR ${ARM_GCC_ERROR_MSG})
+else()
+	set(ARM_CROSS_GCC_ROOT $ENV{ARM_CROSS_GCC_ROOT})
+endif()
+
+# GCC version from latest installsdk.sh script
+set(ARM_GCC_DEFAULT "gcc-4.9-2014.11")
+
+if ("$ENV{ARM_CROSS_GCC_ROOT}" STREQUAL "")
+	if (EXISTS "${HEXAGON_SDK_ROOT}/../../ARM_Tools/${ARM_GCC_DEFAULT}/bin/")
+		set(ARM_CROSS_GCC_ROOT "${HEXAGON_SDK_ROOT}/../../ARM_Tools/${ARM_GCC_DEFAULT}")
+	elseif (EXISTS "${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin/arm-linux-gnueabihf-gcc")
+		set(ARM_CROSS_GCC_ROOT "${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux")
+	elseif (EXISTS "${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc")
+		set(ARM_CROSS_GCC_ROOT "${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf")
+	else()
+		message(FATAL_ERROR "No supported version of ARMv7hf GCC cross compiler found")
+	endif()
+else()
+	if (EXISTS "$ENV{ARM_CROSS_GCC_ROOT}/bin/arm-linux-gnueabihf-gcc")
+		set(ARM_CROSS_GCC_ROOT $ENV{ARM_CROSS_GCC_ROOT})
+	else()
+		message(FATAL_ERROR "No supported version of ARMv7hf GCC cross compiler found in ${ARM_CROSS_GCC_ROOT}/bin")
+	endif()
+endif()
+
 # Find the ARM cross compiler for making a bundle
 foreach(tool arm-linux-gnueabihf-gcc arm-linux-gnueabihf-g++)
         string(TOUPPER ${tool} TOOL)
 	find_program(${TOOL} ${tool}
 		PATHS
-			${HEXAGON_SDK_ROOT}/gcc-linaro-arm-linux-gnueabihf-4.8-2013.08_linux/bin
-			${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin
-			${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin
+			${ARM_CROSS_GCC_ROOT}/bin
 		NO_DEFAULT_PATH
 		)
 	if(NOT ${TOOL})
