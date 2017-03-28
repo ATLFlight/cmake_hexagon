@@ -58,6 +58,12 @@ else()
         set(HEXAGON_ARM_SYSROOT $ENV{HEXAGON_ARM_SYSROOT})
 endif()
 
+if ("$ENV{ARM_TOOLS_ROOT}" STREQUAL "")
+        message(FATAL_ERROR "ARM_TOOLS_ROOT not set")
+else()
+        set(ARM_TOOLS_ROOT $ENV{ARM_TOOLS_ROOT})
+endif()
+
 # this one is important
 set(CMAKE_SYSTEM_NAME Generic)
 
@@ -67,10 +73,7 @@ set(CMAKE_SYSTEM_VERSION 1)
 # specify the cross compiler
 find_program(C_COMPILER arm-linux-gnueabihf-gcc
 	PATHS
-		${ARM_TOOLS_ROOT}/bin
-		${HEXAGON_SDK_ROOT}/gcc-linaro-arm-linux-gnueabihf-4.8-2013.08_linux/bin
-		${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin
-		${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin
+		${ARM_TOOLS_ROOT}/${ARM_GCC_VERSION}/bin
 	NO_DEFAULT_PATH
 	)
 
@@ -81,10 +84,7 @@ cmake_force_c_compiler(${C_COMPILER} GNU)
 
 find_program(CXX_COMPILER arm-linux-gnueabihf-g++
 	PATHS
-		${ARM_TOOLS_ROOT}/bin
-		${HEXAGON_SDK_ROOT}/gcc-linaro-arm-linux-gnueabihf-4.8-2013.08_linux/bin
-		${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin
-		${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin
+		${ARM_TOOLS_ROOT}/${ARM_GCC_VERSION}/bin
 	NO_DEFAULT_PATH
 	)
 
@@ -98,10 +98,7 @@ foreach(tool objcopy nm ld)
 	string(TOUPPER ${tool} TOOL)
 	find_program(${TOOL} arm-linux-gnueabihf-${tool}
 		PATHS
-			${ARM_TOOLS_ROOT}/bin
-			${HEXAGON_SDK_ROOT}/gcc-linaro-arm-linux-gnueabihf-4.8-2013.08_linux/bin
-			${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux/bin
-			${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin
+			${ARM_TOOLS_ROOT}/${ARM_GCC_VERSION}/bin
 		NO_DEFAULT_PATH
 		)
 	if(NOT ${TOOL})

@@ -50,6 +50,10 @@ set(TOOLS_ERROR_MSG
 		"HEXAGON_Tools must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
 		"(e.g. export HEXAGON_TOOLS_ROOT=$ENV{HOME}/Qualcomm/HEXAGON_Tools/7.2.12/Tools)")
 
+set(TOOLS_ERROR_MSG
+		"An ARMv7hf gcc cross compiler must be installed and the environment variable ARM_TOOLS_ROOT must be set"
+		"(e.g. export ARM_TOOLS_ROOT=$ENV{HOME}/Qualcomm/ARM_Tools/)")
+
 if ("$ENV{HEXAGON_TOOLS_ROOT}" STREQUAL "")
 	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
 else()
@@ -107,3 +111,29 @@ endif()
 if (NOT ("${DSP_TYPE}" STREQUAL "ADSP" OR "${DSP_TYPE}" STREQUAL "SLPI"))
 	message(FATAL_ERROR "DSP_TYPE set to invalid value")
 endif()
+
+# GCC version from latest installsdk.sh script
+set(ARM_GCC_DEFAULT "gcc-4.9-2014.11")
+
+if ("$ENV{ARM_TOOLS_ROOT}" STREQUAL "")
+	if (EXISTS "${HEXAGON_SDK_ROOT}/../../ARM_Tools/${ARM_GCC_DEFAULT}")
+		set(ARM_GCC_VERSION "${ARM_GCC_DEFAULT}")
+		set(ARM_TOOLS_ROOT "${HEXAGON_SDK_ROOT}/../../ARM_Tools")
+	elseif (EXISTS "${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux")
+		set(ARM_GCC_VERSION "gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabihf_linux")
+		set(ARM_TOOLS_ROOT "${HEXAGON_SDK_ROOT}")
+	elseif (EXISTS "${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf")
+		set(ARM_GCC_VERSION "gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf")
+		set(ARM_TOOLS_ROOT "${HEXAGON_SDK_ROOT}")
+	else()
+		message(FATAL_ERROR "No supported version of ARMv7hf GCC cross compiler found")
+	endif()
+else()
+	if (EXISTS "$ENV{ARM_TOOLS_ROOT}/${ARM_GCC_DEFAULT}")
+		set(ARM_GCC_VERSION "${ARM_GCC_DEFAULT}")
+		set(ARM_TOOLS_ROOT $ENV{ARM_TOOLS_ROOT})
+	else()
+		message(FATAL_ERROR "No supported version of ARMv7hf GCC cross compiler found in ${ARM_TOOLS_ROOT}")
+	endif()
+endif()
+
