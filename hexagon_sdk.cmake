@@ -50,10 +50,6 @@ set(TOOLS_ERROR_MSG
 		"HEXAGON_Tools must be installed and the environment variable HEXAGON_TOOLS_ROOT must be set"
 		"(e.g. export HEXAGON_TOOLS_ROOT=$ENV{HOME}/Qualcomm/HEXAGON_Tools/7.2.12/Tools)")
 
-set(TOOLS_ERROR_MSG
-		"An ARMv7hf gcc cross compiler must be installed and the environment variable ARM_TOOLS_ROOT must be set"
-		"(e.g. export ARM_TOOLS_ROOT=$ENV{HOME}/Qualcomm/ARM_Tools/)")
-
 if ("$ENV{HEXAGON_TOOLS_ROOT}" STREQUAL "")
 	message(FATAL_ERROR ${TOOLS_ERROR_MSG})
 else()
