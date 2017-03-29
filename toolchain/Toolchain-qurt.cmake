@@ -136,12 +136,6 @@ endif()
 set(ARM_GCC_ERROR_MSG
 	"The environment variable ARM_CROSS_GCC_ROOT must be set to the directory containing the ARMv7hf cross compiler")
 
-if ("$ENV{ARM_CROSS_GCC_ROOT}" STREQUAL "")
-	message(FATAL_ERROR ${ARM_GCC_ERROR_MSG})
-else()
-	set(ARM_CROSS_GCC_ROOT $ENV{ARM_CROSS_GCC_ROOT})
-endif()
-
 # GCC version from latest installsdk.sh script
 set(ARM_GCC_DEFAULT "gcc-4.9-2014.11")
 
