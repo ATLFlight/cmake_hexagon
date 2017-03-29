@@ -133,9 +133,6 @@ else()
 	set(HEXAGON_SDK_ROOT $ENV{HEXAGON_SDK_ROOT})
 endif()
 
-set(ARM_GCC_ERROR_MSG
-	"The environment variable ARM_CROSS_GCC_ROOT must be set to the directory containing the ARMv7hf cross compiler")
-
 # GCC version from latest installsdk.sh script
 set(ARM_GCC_DEFAULT "gcc-4.9-2014.11")
 
