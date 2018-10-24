@@ -28,7 +28,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-
+#message(FATAL_ERROR "CWS 1")
 include(CMakeForceCompiler)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -51,17 +51,18 @@ macro (list2string out in)
 	endforeach()
 endmacro(list2string)
 
-set(V_ARCH "v5")
 set(CROSSDEV "hexagon-")
 
 # Detect compiler version
 if(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/6.4.")
 
+	set(V_ARCH "v5")
+
 	# Use the HexagonTools compiler (6.4.06) - This is deprecated
 	set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/qc/bin)
 	set(HEXAGON_GNU_BIN ${HEXAGON_TOOLS_ROOT}/gnu/bin)
 	set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
-set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/dinkumware/lib/${V_ARCH}/G0/pic)
+	set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/dinkumware/lib/${V_ARCH}/G0/pic)
 
 	set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
 	set(CMAKE_CXX_COMPILER  ${HEXAGON_BIN}/${CROSSDEV}clang++)
@@ -74,14 +75,16 @@ set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/dinkumware/lib/${V_ARCH}/G0/pic)
 	set(CMAKE_OBJDUMP ${HEXAGON_GNU_BIN}/${CROSSDEV}objdump)
 	set(CMAKE_OBJCOPY ${HEXAGON_GNU_BIN}/${CROSSDEV}objcopy)
 	set(HEXAGON_LINK  ${HEXAGON_GNU_BIN}/${CROSSDEV}ld)
-set(HEXAGON_ARCH_FLAGS  -march=hexagonv5)
+	set(HEXAGON_ARCH_FLAGS  -march=hexagonv5)
 
 elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
+
+	set(V_ARCH "v5")
 
 	# Use the HexagonTools compiler (7.2.12) from Hexagon 3.0 SDK
 	set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/bin)
 	set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
-set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
+	set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
 
 	set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
 	set(CMAKE_CXX_COMPILER  ${HEXAGON_BIN}/${CROSSDEV}clang++)
@@ -94,7 +97,33 @@ set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
 	set(CMAKE_OBJDUMP ${HEXAGON_BIN}/${CROSSDEV}objdump)
 	set(CMAKE_OBJCOPY ${HEXAGON_BIN}/${CROSSDEV}objcopy)
 	set(HEXAGON_LINK  ${HEXAGON_BIN}/${CROSSDEV}link)
-set(HEXAGON_ARCH_FLAGS
+	set(HEXAGON_ARCH_FLAGS
+	-march=hexagon
+	-mcpu=hexagonv5
+	)
+
+elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/8.0.")
+
+	# TODO Upgrade to v60
+	set(V_ARCH "v5")
+
+	# Use the HexagonTools compiler (8.0.08) from Hexagon 3.1 SDK
+	set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/bin)
+	set(HEXAGON_ISS_DIR ${HEXAGON_TOOLS_ROOT}/lib/iss)
+	set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
+
+	set(CMAKE_C_COMPILER	${HEXAGON_BIN}/${CROSSDEV}clang)
+	set(CMAKE_CXX_COMPILER  ${HEXAGON_BIN}/${CROSSDEV}clang++)
+
+	set(CMAKE_AR	  ${HEXAGON_BIN}/${CROSSDEV}ar CACHE FILEPATH "Archiver")
+        SET(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> qcD <TARGET> <LINK_FLAGS> <OBJECTS>")
+        SET(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> qcD <TARGET> <LINK_FLAGS> <OBJECTS>")
+	set(CMAKE_RANLIB  ${HEXAGON_BIN}/${CROSSDEV}ranlib)
+	set(CMAKE_NM	  ${HEXAGON_BIN}/${CROSSDEV}nm)
+	set(CMAKE_OBJDUMP ${HEXAGON_BIN}/${CROSSDEV}objdump)
+	set(CMAKE_OBJCOPY ${HEXAGON_BIN}/${CROSSDEV}objcopy)
+	set(HEXAGON_LINK  ${HEXAGON_BIN}/${CROSSDEV}link)
+	set(HEXAGON_ARCH_FLAGS
 	-march=hexagon
 	-mcpu=hexagonv5
 	)
