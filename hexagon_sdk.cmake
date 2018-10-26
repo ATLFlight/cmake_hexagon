@@ -95,7 +95,14 @@ elseif ("${QC_SOC_TARGET}" STREQUAL "APQ8096")
 	if ("${DSP_TYPE}" STREQUAL "")
 		set(DSP_TYPE "SLPI")
 	endif()
-	set(V_ARCH "v60")
+
+	if ("${DSP_TYPE}" STREQUAL "SLPI")
+		set(V_ARCH "v60")
+	elseif ("${DSP_TYPE}" STREQUAL "ADSP")
+		set(V_ARCH "v60")
+	endif()
+
+	
 	set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
 		${HEXAGON_SDK_ROOT}/${SDKLIB}/common/qurt/ADSPv60MP/include
 		)
