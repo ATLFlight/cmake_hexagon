@@ -68,7 +68,7 @@ set(FASTRPC_ARM_LINUX_INCLUDES
 if ("${DSP_TYPE}" STREQUAL "ADSP")
 	set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
 elseif("${DSP_TYPE}" STREQUAL "SLPI")
-	set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -lsdsprpc)
+	set(ADSPRPC -lsdsprpc)
 else()
 	message(FATAL_ERROR "DSP_TYPE not defined")
 endif()

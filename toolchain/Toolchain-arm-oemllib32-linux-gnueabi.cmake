@@ -46,16 +46,10 @@
 
 include(CMakeForceCompiler)
 
-if ("$ENV{HEXAGON_SDK_ROOT}" STREQUAL "")
-        message(FATAL_ERROR "HEXAGON_SDK_ROOT not set")
+if ("$ENV{SDKROOT}" STREQUAL "")
+				message(FATAL_ERROR "SDKROOT not set")
 else()
-        set(HEXAGON_SDK_ROOT $ENV{HEXAGON_SDK_ROOT})
-endif()
-
-if ("$ENV{HEXAGON_ARM_SYSROOT}" STREQUAL "")
-        message(FATAL_ERROR "HEXAGON_ARM_SYSROOT not set")
-else()
-        set(HEXAGON_ARM_SYSROOT $ENV{HEXAGON_ARM_SYSROOT})
+				set(SDKROOT $ENV{SDKROOT})
 endif()
 
 # this one is important
@@ -67,8 +61,8 @@ set(CMAKE_SYSTEM_VERSION 1)
 # specify the cross compiler
 
 #temporary variables to set up the cross compilation environment
-set(ARM_CROSS_COMPILIER_PREFIX "arm-oemllib32-linux-gnueabi" )
-set(ARM_COMPILER_PATH "${HEXAGON_ARM_SYSROOT}/x86_64-linux/usr/bin/${ARM_CROSS_COMPILIER_PREFIX}" )
+set(ARM_CROSS_COMPILIER_PREFIX "arm-oemllib32-linux" )
+set(ARM_COMPILER_PATH "${SDKROOT}/sysroots/x86_64-oesdk-linux/usr/bin/${ARM_CROSS_COMPILIER_PREFIX}" )
 set(ARM_C_COMPILER "${ARM_CROSS_COMPILIER_PREFIX}-gcc" )
 set(ARM_CPP_COMPILER "${ARM_CROSS_COMPILIER_PREFIX}-g++" )
 
@@ -113,9 +107,7 @@ foreach(tool echo grep rm mkdir nm cp touch make unzip)
 	endif()
 endforeach()
 
-#override the ARM sysroot.
-set(CMAKE_SYSROOT "${HEXAGON_ARM_SYSROOT}/lib32-apq8096" )
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,-gc-sections -Wl,-rpath-link,${CMAKE_SYSROOT}/usr/lib/${ARM_CROSS_COMPILIER_PREFIX} -Wl,-rpath-link,${CMAKE_SYSROOT}/lib/${ARM_CROSS_COMPILIER_PREFIX}" )
+set(CMAKE_SYSROOT ${SDKROOT}/sysroots/aarch64-oe-linux)
 
 # where is the target environment
 set(CMAKE_FIND_ROOT_PATH  get_file_component(${C_COMPILER} PATH))
