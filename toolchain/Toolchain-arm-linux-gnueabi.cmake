@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016 Ramakrishna Kintada. All rights reserved.
+# Copyright (C) 2015 Mark Charlebois. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -58,49 +58,66 @@ else()
         set(HEXAGON_ARM_SYSROOT $ENV{HEXAGON_ARM_SYSROOT})
 endif()
 
+# GCC version from latest installsdk.sh script
+set(ARM_GCC_DEFAULT "gcc-4.9-2014.11")
+
+if ("$ENV{ARM_CROSS_GCC_ROOT}" STREQUAL "")
+	if (EXISTS "${HEXAGON_SDK_ROOT}/../../ARM_Tools/${ARM_GCC_DEFAULT}/bin/")
+		set(ARM_CROSS_GCC_ROOT "${HEXAGON_SDK_ROOT}/../../ARM_Tools/${ARM_GCC_DEFAULT}")
+	elseif (EXISTS "${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabi_linux/bin/arm-linux-gnueabi-gcc")
+		set(ARM_CROSS_GCC_ROOT "${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2014.11-x86_64_arm-linux-gnueabi_linux")
+	elseif (EXISTS "${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-gcc")
+		set(ARM_CROSS_GCC_ROOT "${HEXAGON_SDK_ROOT}/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabi")
+	else()
+		message(FATAL_ERROR "No supported version of ARMv7hf GCC cross compiler found")
+	endif()
+else()
+	if (EXISTS "$ENV{ARM_CROSS_GCC_ROOT}/bin/arm-linux-gnueabi-gcc")
+		set(ARM_CROSS_GCC_ROOT $ENV{ARM_CROSS_GCC_ROOT})
+	else()
+		message(FATAL_ERROR "No supported version of ARMv7hf GCC cross compiler found in ${ARM_CROSS_GCC_ROOT}/bin")
+	endif()
+endif()
+
 # this one is important
 set(CMAKE_SYSTEM_NAME "Linux")
 
-#this one not so much
+# this one not so much
 set(CMAKE_SYSTEM_VERSION 1)
 
 # specify the cross compiler
-
-#temporary variables to set up the cross compilation environment
-set(ARM_CROSS_COMPILIER_PREFIX "arm-oemllib32-linux-gnueabi" )
-set(ARM_COMPILER_PATH "${HEXAGON_ARM_SYSROOT}/x86_64-linux/usr/bin/${ARM_CROSS_COMPILIER_PREFIX}" )
-set(ARM_C_COMPILER "${ARM_CROSS_COMPILIER_PREFIX}-gcc" )
-set(ARM_CPP_COMPILER "${ARM_CROSS_COMPILIER_PREFIX}-g++" )
-
-find_program(C_COMPILER ${ARM_C_COMPILER}
-        PATHS ${ARM_COMPILER_PATH}
+find_program(C_COMPILER arm-linux-gnueabi-gcc
+	PATHS
+		${ARM_CROSS_GCC_ROOT}/bin
 	NO_DEFAULT_PATH
 	)
 
 if(NOT C_COMPILER)
-	message(FATAL_ERROR "could not find ${ARM_C_COMPILER} compiler")
+	message(FATAL_ERROR "could not find arm-linux-gnueabi-gcc compiler")
 endif()
 cmake_force_c_compiler(${C_COMPILER} GNU)
 
-find_program(CXX_COMPILER ${ARM_CPP_COMPILER}
-        PATHS ${ARM_COMPILER_PATH}
+find_program(CXX_COMPILER arm-linux-gnueabi-g++
+	PATHS
+		${ARM_CROSS_GCC_ROOT}/bin
 	NO_DEFAULT_PATH
 	)
 
 if(NOT CXX_COMPILER)
-	message(FATAL_ERROR "could not find ${ARM_CPP_COMPILER} compiler")
+	message(FATAL_ERROR "could not find arm-linux-gnueabi-g++ compiler")
 endif()
 cmake_force_cxx_compiler(${CXX_COMPILER} GNU)
 
 # compiler tools
 foreach(tool objcopy nm ld)
 	string(TOUPPER ${tool} TOOL)
-	find_program(${TOOL} ${ARM_CROSS_COMPILIER_PREFIX}-${tool}
-                PATHS ${ARM_COMPILER_PATH}
+	find_program(${TOOL} arm-linux-gnueabi-${tool}
+		PATHS
+			${ARM_CROSS_GCC_ROOT}/bin
 		NO_DEFAULT_PATH
 		)
 	if(NOT ${TOOL})
-		message(FATAL_ERROR "could not find ${ARM_CROSS_COMPILIER_PREFIX}-${tool}")
+		message(FATAL_ERROR "could not find arm-linux-gnueabi-${tool}")
 	endif()
 endforeach()
 
@@ -113,9 +130,8 @@ foreach(tool echo grep rm mkdir nm cp touch make unzip)
 	endif()
 endforeach()
 
-#override the ARM sysroot.
-set(CMAKE_SYSROOT "${HEXAGON_ARM_SYSROOT}/lib32-apq8096" )
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,-gc-sections -Wl,-rpath-link,${CMAKE_SYSROOT}/usr/lib/${ARM_CROSS_COMPILIER_PREFIX} -Wl,-rpath-link,${CMAKE_SYSROOT}/lib/${ARM_CROSS_COMPILIER_PREFIX}" )
+set(CMAKE_SYSROOT ${HEXAGON_ARM_SYSROOT})
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,-gc-sections -Wl,-rpath-link,${HEXAGON_ARM_SYSROOT}/usr/lib/arm-linux-gnueabi -Wl,-rpath-link,${HEXAGON_ARM_SYSROOT}/lib/arm-linux-gnueabi")
 
 # where is the target environment
 set(CMAKE_FIND_ROOT_PATH  get_file_component(${C_COMPILER} PATH))
