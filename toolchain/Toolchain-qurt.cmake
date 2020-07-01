@@ -104,8 +104,7 @@ elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
 
 elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/8.0.")
 
-	# TODO Upgrade to v60
-	set(V_ARCH "v5")
+	set(V_ARCH "v60")
 
 	# Use the HexagonTools compiler (8.0.08) from Hexagon 3.1 SDK
 	set(HEXAGON_BIN	${HEXAGON_TOOLS_ROOT}/bin)

@@ -69,6 +69,7 @@ if ("${DSP_TYPE}" STREQUAL "ADSP")
 	set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -ladsprpc)
 elseif("${DSP_TYPE}" STREQUAL "SLPI")
 	set(ADSPRPC -L${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE} -lsdsprpc)
+
 else()
 	message(FATAL_ERROR "DSP_TYPE not defined")
 endif()
@@ -79,7 +80,7 @@ set(FASTRPC_ARM_LIBS
 	${ADSPRPC}
 	)
 
-	
+
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
 	)
@@ -88,7 +89,7 @@ function(FASTRPC_STUB_GEN IDLFILE)
 	get_filename_component(FASTRPC_IDL_NAME ${IDLFILE} NAME_WE)
 	get_filename_component(FASTRPC_IDL_PATH ${IDLFILE} ABSOLUTE)
 	set (IDLINCS ${ARGN})
-    
+
 	# prepend -I in front of QAIC include dirs
 	set(QAIC_INCLUDE_DIRS)
 	foreach(inc ${IDLINCS})
@@ -101,7 +102,7 @@ function(FASTRPC_STUB_GEN IDLFILE)
 			message("QAIC include directory: -I${CMAKE_CURRENT_SOURCE_DIR}/${inc}")
 		endif()
 	endforeach()
-	
+
 	# Run the IDL compiler to generate the stubs
 	add_custom_command(
 		OUTPUT ${FASTRPC_IDL_NAME}.h ${FASTRPC_IDL_NAME}_skel.c ${FASTRPC_IDL_NAME}_stub.c
