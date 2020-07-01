@@ -179,7 +179,7 @@ if ("$ENV{ARM_CROSS_GCC_ROOT}" STREQUAL "")
 		message(FATAL_ERROR "No supported version of ARMv7 GCC cross compiler found")
 	endif()
 else()
-	if (EXISTS "$ENV{ARM_CROSS_GCC_ROOT}/bin/arm-linux-gnueabi-gcc")
+	if (EXISTS "$ENV{ARM_CROSS_GCC_ROOT}/bin/arm-linux-gnueabihf-gcc")
 		set(ARM_CROSS_GCC_ROOT $ENV{ARM_CROSS_GCC_ROOT})
 	else()
 		message(FATAL_ERROR "No supported version of ARMv7 GCC cross compiler found in ${ARM_CROSS_GCC_ROOT}/bin")
@@ -187,7 +187,7 @@ else()
 endif()
 
 # Find the ARM cross compiler for making a bundle
-foreach(tool arm-linux-gnueabi-gcc arm-linux-gnueabi-g++)
+foreach(tool arm-linux-gnueabihf-gcc arm-linux-gnueabihf-g++)
         string(TOUPPER ${tool} TOOL)
 	find_program(${TOOL} ${tool}
 		PATHS
