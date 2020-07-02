@@ -102,7 +102,7 @@ elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
 	-mcpu=hexagonv5
 	)
 
-elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/8.0.")
+elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/8.")
 
 	set(V_ARCH "v60")
 

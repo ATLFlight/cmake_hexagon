@@ -40,7 +40,7 @@ elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/7.2.")
 		-march=hexagon
 		-mcpu=hexagon${V_ARCH}
 		)
-elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/8.0.")
+elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/8.")
 	set(TOOLSLIB ${HEXAGON_TOOLS_ROOT}/target/hexagon/lib/${V_ARCH}/G0/pic)
 	set(HEXAGON_ARCH_FLAGS
 		-march=hexagon
