@@ -62,18 +62,7 @@ endif()
 
 if ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/2.0")
 	message(FATAL_ERROR "HEXAGON_SDK 2.0 no longer supported")
-elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.0")
-	set(SDKINC incs)
-	set(SDKLIB libs)
-	set(SDKRPCMEMINC /inc)
-elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.1")
-	set(SDKINC incs)
-	set(SDKLIB libs)
-	set(SDKRPCMEMINC /inc)
 elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.5")
-	set(SDKINC incs)
-	set(SDKLIB libs)
-	set(SDKRPCMEMINC /inc)
 else()
         message(FATAL_ERROR "Unsupported/Unknown HEXAGON SDK version")
 endif()
@@ -81,30 +70,35 @@ endif()
 set(HEXAGON_SDK_ROOT $ENV{HEXAGON_SDK_ROOT})
 
 set(HEXAGON_SDK_INCLUDES
-	${HEXAGON_SDK_ROOT}/${SDKINC}
-	${HEXAGON_SDK_ROOT}/${SDKINC}/stddef
-	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem${SDKRPCMEMINC}
+	${HEXAGON_SDK_ROOT}/incs
+	${HEXAGON_SDK_ROOT}/incs/stddef
+	${HEXAGON_SDK_ROOT}/libs/common/rpcmem/inc
 	)
 
-if ("${QC_SOC_TARGET}" STREQUAL "APQ8074")
-	set(DSP_TYPE "ADSP")
-	set(V_ARCH "v55")
-	set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
-		${HEXAGON_SDK_ROOT}/${SDKLIB}/common/qurt/ADSPv55MP/include
-		)
-elseif ("${QC_SOC_TARGET}" STREQUAL "APQ8096")
-	# Set the default to SLPI
-	if ("${DSP_TYPE}" STREQUAL "")
-		set(DSP_TYPE "SLPI")
-	endif()
 
+# if ("${QC_SOC_TARGET}" STREQUAL "APQ8074")
+# 	set(DSP_TYPE "ADSP")
+# 	set(V_ARCH "v55")
+# 	set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
+# 		${HEXAGON_SDK_ROOT}/libs/common/qurt/ADSPv55MP/include
+# 		)
+
+# elseif ("${QC_SOC_TARGET}" STREQUAL "APQ8096")
+# 	# Set the default to SLPI
+# 	if ("${DSP_TYPE}" STREQUAL "")
+# 		set(DSP_TYPE "SLPI")
+# 	endif()
+
+	set(DSP_TYPE "SLPI")
 	set(V_ARCH "v60")
 	set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
-		${HEXAGON_SDK_ROOT}/${SDKLIB}/common/qurt/ADSPv60MP/include
+		${HEXAGON_SDK_ROOT}/libs/common/qurt/ADSPv60MP/include/qurt
 		)
-else()
+# else()
+if (1)
 	message(FATAL_ERROR "QC_SOC_TARGET not set")
 endif()
+# endif()
 
 # Validate DSP_TYPE
 if (NOT ("${DSP_TYPE}" STREQUAL "ADSP" OR "${DSP_TYPE}" STREQUAL "SLPI"))
