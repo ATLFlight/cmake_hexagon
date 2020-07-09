@@ -63,6 +63,11 @@ endif()
 if ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/2.0")
 	message(FATAL_ERROR "HEXAGON_SDK 2.0 no longer supported")
 elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.5")
+	# TODO: what is the purpose of this?
+	set(SDKINC incs)
+	set(SDKLIB libs)
+	set(SDKRPCMEMINC /inc)
+
 else()
         message(FATAL_ERROR "Unsupported/Unknown HEXAGON SDK version")
 endif()
@@ -75,30 +80,12 @@ set(HEXAGON_SDK_INCLUDES
 	${HEXAGON_SDK_ROOT}/libs/common/rpcmem/inc
 	)
 
+set(DSP_TYPE "SLPI")
+set(V_ARCH "v60")
+set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
+	${HEXAGON_SDK_ROOT}/libs/common/qurt/ADSPv60MP/include/qurt
+	)
 
-# if ("${QC_SOC_TARGET}" STREQUAL "APQ8074")
-# 	set(DSP_TYPE "ADSP")
-# 	set(V_ARCH "v55")
-# 	set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
-# 		${HEXAGON_SDK_ROOT}/libs/common/qurt/ADSPv55MP/include
-# 		)
-
-# elseif ("${QC_SOC_TARGET}" STREQUAL "APQ8096")
-# 	# Set the default to SLPI
-# 	if ("${DSP_TYPE}" STREQUAL "")
-# 		set(DSP_TYPE "SLPI")
-# 	endif()
-
-	set(DSP_TYPE "SLPI")
-	set(V_ARCH "v60")
-	set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
-		${HEXAGON_SDK_ROOT}/libs/common/qurt/ADSPv60MP/include/qurt
-		)
-# else()
-if (1)
-	message(FATAL_ERROR "QC_SOC_TARGET not set")
-endif()
-# endif()
 
 # Validate DSP_TYPE
 if (NOT ("${DSP_TYPE}" STREQUAL "ADSP" OR "${DSP_TYPE}" STREQUAL "SLPI"))
