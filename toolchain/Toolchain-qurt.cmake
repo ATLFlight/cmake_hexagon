@@ -124,7 +124,7 @@ elseif(${HEXAGON_TOOLS_ROOT} MATCHES "HEXAGON_Tools/8.")
 	set(HEXAGON_LINK  ${HEXAGON_BIN}/${CROSSDEV}link)
 	set(HEXAGON_ARCH_FLAGS
 	-march=hexagon
-	-mcpu=hexagonv5
+	-mcpu=hexagonv6
 	)
 
 else()

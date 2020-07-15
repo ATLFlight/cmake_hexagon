@@ -103,11 +103,19 @@ function(FASTRPC_STUB_GEN IDLFILE)
 		endif()
 	endforeach()
 
+	if ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.1")
+		set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Linux/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
+	elseif("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.4")
+		set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu16/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
+	else()
+		set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu18/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
+	endif()
+
 	# Run the IDL compiler to generate the stubs
 	add_custom_command(
 		OUTPUT ${FASTRPC_IDL_NAME}.h ${FASTRPC_IDL_NAME}_skel.c ${FASTRPC_IDL_NAME}_stub.c
 		DEPENDS ${FASTRPC_IDL_PATH}
-		COMMAND "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu18/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef" ${QAIC_INCLUDE_DIRS} ${FASTRPC_IDL_PATH}
+		COMMAND ${QAIC_PATH} ${QAIC_INCLUDE_DIRS} ${FASTRPC_IDL_PATH} # for 3.5.1
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		)
 

@@ -128,7 +128,7 @@ function (QURT_LIB)
       # 8x74 target is assumed by default.
       set(DSPLIB_TARGET_PATH "/usr/share/data/adsp/")
    endif()
-   
+
 	if ("${QURT_LIB_LIB_NAME}" STREQUAL "")
 		# Add a rule to load the files onto the target that run in the DSP
 		add_custom_target(lib${QURT_LIB_IDL_NAME}_skel-load
