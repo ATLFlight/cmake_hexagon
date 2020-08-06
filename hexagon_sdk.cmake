@@ -62,23 +62,7 @@ endif()
 
 if ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/2.0")
 	message(FATAL_ERROR "HEXAGON_SDK 2.0 no longer supported")
-elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.1")
-	# TODO: what is the purpose of this?
-	set(SDKINC incs)
-	set(SDKLIB libs)
-	set(SDKRPCMEMINC /inc)
-elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.3")
-	# TODO: what is the purpose of this?
-	set(SDKINC incs)
-	set(SDKLIB libs)
-	set(SDKRPCMEMINC /inc)
-elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.4")
-	# TODO: what is the purpose of this?
-	set(SDKINC incs)
-	set(SDKLIB libs)
-	set(SDKRPCMEMINC /inc)
-elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.5")
-	# TODO: what is the purpose of this?
+elseif ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.")
 	set(SDKINC incs)
 	set(SDKLIB libs)
 	set(SDKRPCMEMINC /inc)
