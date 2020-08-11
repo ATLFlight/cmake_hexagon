@@ -82,7 +82,8 @@ set(HEXAGON_SDK_INCLUDES
 set(DSP_TYPE "SLPI")
 set(V_ARCH "v60")
 set(HEXAGON_SDK_INCLUDES ${HEXAGON_SDK_INCLUDES}
-	${HEXAGON_SDK_ROOT}/libs/common/qurt/ADSPv60MP/include/qurt
+	# ${HEXAGON_SDK_ROOT}/libs/common/qurt/ADSPv60MP/include/qurt #3.3 doesn't have the qurt directory
+	${HEXAGON_SDK_ROOT}/libs/common/qurt/ADSPv60MP/include
 	)
 
 

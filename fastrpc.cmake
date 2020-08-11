@@ -52,16 +52,39 @@ if(NOT ("${RELEASE}" STREQUAL "Debug" OR "${RELEASE}" STREQUAL "Release"))
 	message(FATAL "RELEASE must be set to Debug or Release")
 endif()
 
+# Set paths depending on version of SDK in use
+if ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.0")
+	set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Linux/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
+	set(HEXAGON_RPC_LIB "hexagon_${RELEASE}")
+
+elseif("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.1")
+	set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Linux/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
+	# set(HEXAGON_RPC_LIB "hexagon_${RELEASE}") # TODO
+
+elseif("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.3")
+	set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
+	set(HEXAGON_RPC_LIB "hexagon_Debug_toolv81_v60")
+
+elseif("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.4")
+	set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu16/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
+	# set(HEXAGON_RPC_LIB "hexagon_${RELEASE}") # TODO
+
+else()
+	set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu18/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
+	# set(HEXAGON_RPC_LIB "hexagon_${RELEASE}") # TODO
+endif()
+
 set(FASTRPC_DSP_INCLUDES
 	${HEXAGON_SDK_INCLUDES}
 	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem
-	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/hexagon_${RELEASE}
+	# ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/hexagon_${RELEASE}
+	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/${HEXAGON_RPC_LIB}
 	)
 
 set(FASTRPC_ARM_LINUX_INCLUDES
 	${HEXAGON_SDK_INCLUDES}
 	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/rpcmem
-	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE}
+	# ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE} # doesn't exist in 3.3.3
 	${HEXAGON_SDK_ROOT}/${SDKLIB}/common/remote/ship/UbuntuARM_${RELEASE}
 	)
 
@@ -74,7 +97,8 @@ else()
 	message(FATAL_ERROR "DSP_TYPE not defined")
 endif()
 
-set(ADSPMSGD ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
+# what's this for? -- internet says it's for logging, doesn't appear to be used
+# set(ADSPMSGD ${HEXAGON_SDK_ROOT}/${SDKLIB}/common/adspmsgd/ship/UbuntuARM_${RELEASE}/adspmsgd.a)
 
 set(FASTRPC_ARM_LIBS
 	${ADSPRPC}
@@ -103,17 +127,7 @@ function(FASTRPC_STUB_GEN IDLFILE)
 		endif()
 	endforeach()
 
-	if ("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.0")
-		set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Linux/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
-	elseif("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.1")
-		set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Linux/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
-	elseif("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.3")
-		set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu14/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
-	elseif("$ENV{HEXAGON_SDK_ROOT}" MATCHES "/Hexagon_SDK/3.4")
-		set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu16/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
-	else()
-		set(QAIC_PATH "${HEXAGON_SDK_ROOT}/tools/qaic/Ubuntu18/qaic" "-mdll" "-I" "${HEXAGON_SDK_ROOT}/${SDKINC}/stddef")
-	endif()
+
 
 	# Run the IDL compiler to generate the stubs
 	add_custom_command(
